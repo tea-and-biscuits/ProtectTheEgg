@@ -1,0 +1,3 @@
+
+players-per-team: 1
+max-teams: 12 # The maximum this value can be is 12

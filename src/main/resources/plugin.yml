@@ -2,3 +2,9 @@ main: uk.co.harieo.quackbedwars.ProtectTheEgg
 version: 1.0.0
 name: ProtectTheEgg
 author: Harieo
+api-version: '1.15'
+
+permissions:
+    quacktopia.minigames.join:
+        description: 'Allows joining mid-game'
+        default: op
