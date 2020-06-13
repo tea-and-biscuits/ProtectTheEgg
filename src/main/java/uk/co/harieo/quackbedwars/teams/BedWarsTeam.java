@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import net.md_5.bungee.api.ChatColor;
 import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
@@ -27,6 +28,7 @@ public enum BedWarsTeam {
 	GOLD("Orange", ChatColor.GOLD, Color.ORANGE, Material.ORANGE_STAINED_GLASS);
 
 	private final String name;
+	private final String spawnKey;
 	private final ChatColor chatColor;
 	private final Color armourColor;
 	private final Material cageMaterial;
@@ -35,6 +37,7 @@ public enum BedWarsTeam {
 
 	BedWarsTeam(String name, ChatColor chatColor, Color armourColor, Material cageMaterial) {
 		this.name = name;
+		this.spawnKey = name();
 		this.chatColor = chatColor;
 		this.armourColor = armourColor;
 		this.cageMaterial = cageMaterial;
@@ -70,6 +73,10 @@ public enum BedWarsTeam {
 		team.removeTeamMember(player);
 	}
 
+	public String getSpawnKey() {
+		return spawnKey;
+	}
+
 	public boolean isTeamActive() {
 		return ordinal() < ProtectTheEgg.getInstance().getGameConfig().getMaxTeams();
 	}
@@ -77,6 +84,24 @@ public enum BedWarsTeam {
 	@Override
 	public String toString() {
 		return getChatColor() + getName();
+	}
+
+	public static BedWarsTeam getByName(String name) {
+		return getByPredicate(team -> team.getName().equalsIgnoreCase(name));
+	}
+
+	public static BedWarsTeam getBySpawnKey(String key) {
+		return getByPredicate(team -> team.getSpawnKey().equalsIgnoreCase(key));
+	}
+
+	private static BedWarsTeam getByPredicate(Predicate<BedWarsTeam> teamPredicate) {
+		for (BedWarsTeam team : values()) {
+			if (teamPredicate.test(team)) {
+				return team;
+			}
+		}
+
+		return null;
 	}
 
 }

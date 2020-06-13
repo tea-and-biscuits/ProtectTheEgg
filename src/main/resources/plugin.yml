@@ -10,3 +10,6 @@ permissions:
     quacktopia.minigames.join:
         description: 'Allows joining mid-game'
         default: op
+    quacktopia.minigames.maps:
+        description: 'Allows using /maps command'
+        default: op

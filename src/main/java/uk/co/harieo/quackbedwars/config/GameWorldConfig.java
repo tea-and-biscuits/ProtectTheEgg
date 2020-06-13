@@ -13,8 +13,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
+import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
 
 public class GameWorldConfig {
 
@@ -49,6 +52,7 @@ public class GameWorldConfig {
 
 			try {
 				gameWorld = MapImpl.parseWorld(world);
+				parseTeamSpawns(gameWorld);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return;
@@ -93,6 +97,17 @@ public class GameWorldConfig {
 		}
 
 		return world;
+	}
+
+	private void parseTeamSpawns(MapImpl gameWorld) {
+		for (LocationPair pair : gameWorld.getLocationsByKey(TeamSpawnHandler.SPAWN_KEY)) {
+			BedWarsTeam team = BedWarsTeam.getBySpawnKey(pair.getValue());
+			if (team != null) {
+				TeamSpawnHandler.addSpawnLocation(team, pair.getLocation());
+			} else {
+				plugin.getLogger().warning("The game world has a spawn with an unknown team: " + pair.getValue());
+			}
+		}
 	}
 
 	private void setPeaceful(World world) {

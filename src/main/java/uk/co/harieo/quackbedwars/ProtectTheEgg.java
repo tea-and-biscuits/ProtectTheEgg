@@ -75,7 +75,7 @@ public class ProtectTheEgg extends Minigame {
 			lobbyScoreboard.addLine(lobbyTimer);
 			lobbyScoreboard.addBlankLine();
 			lobbyScoreboard.addLine(new ConstantElement(ChatColor.GOLD + ChatColor.BOLD.toString() + "Your Team"));
-			lobbyScoreboard.addLine(new TeamNameElement());
+			lobbyScoreboard.addLine(new TeamNameElement(false));
 		}
 		lobbyScoreboard.addBlankLine();
 		lobbyScoreboard.addLine(IP_ELEMENT);
