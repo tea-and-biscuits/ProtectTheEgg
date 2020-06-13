@@ -8,16 +8,20 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.List;
 
 public class GameConfig {
 
 	private int playersPerTeam = 1;
 	private int maxTeams = 12;
+	private List<String> timerMessages;
+	private GameWorldConfig gameWorldConfig;
 
 	public GameConfig(JavaPlugin plugin) {
 		try {
 			FileConfiguration configuration = getConfiguration(plugin);
 			loadFields(configuration);
+			gameWorldConfig = new GameWorldConfig(plugin, configuration);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -49,6 +53,7 @@ public class GameConfig {
 	private void loadFields(FileConfiguration configuration) {
 		playersPerTeam = configuration.getInt("players-per-team");
 		maxTeams = configuration.getInt("max-teams");
+		timerMessages = configuration.getStringList("timer-messages");
 	}
 
 	public int getPlayersPerTeam() {
@@ -57,6 +62,14 @@ public class GameConfig {
 
 	public int getMaxTeams() {
 		return maxTeams;
+	}
+
+	public List<String> getTimerMessages() {
+		return timerMessages;
+	}
+
+	public GameWorldConfig getGameWorldConfig() {
+		return gameWorldConfig;
 	}
 
 }

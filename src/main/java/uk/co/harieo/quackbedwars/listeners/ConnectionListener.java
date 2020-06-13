@@ -49,7 +49,7 @@ public class ConnectionListener implements Listener {
 			event.setJoinMessage(ProtectTheEgg.formatMessage(
 					ChatColor.GREEN + player.getName() + ChatColor.GRAY + " is prepared to defend their egg!"));
 			plugin.setLobbyScoreboard(player);
-			// TODO teleport to lobby spawn
+			player.teleport(plugin.getGameWorldConfig().getLobbyWorld().getSpawnLocation());
 
 			int playerCount = Bukkit.getOnlinePlayers().size();
 			updateTimer(plugin, playerCount);

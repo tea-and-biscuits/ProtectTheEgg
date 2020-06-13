@@ -1,3 +1,12 @@
-
+lobby-world: world
+game-worlds:
+    - example_world
 players-per-team: 1
 max-teams: 12 # The maximum this value can be is 12
+timer-messages:
+    - 'Restocking the battle bread'
+    - 'Painting the eggs pretty colours'
+    - 'Checking the Quack-o-Meter for optimal quack'
+    - 'Checking for high quality memes on social media'
+    - 'Refuelling the magic chicken core to increase egg production'
+    - 'Petting the local cats and manticores'
