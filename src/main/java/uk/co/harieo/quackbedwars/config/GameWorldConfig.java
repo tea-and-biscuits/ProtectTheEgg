@@ -1,6 +1,7 @@
 package uk.co.harieo.quackbedwars.config;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -33,6 +34,7 @@ public class GameWorldConfig {
 			return;
 		} else {
 			lobbyWorld = Bukkit.getWorld(lobbyWorldName);
+			setPeaceful(lobbyWorld);
 		}
 
 		List<String> gameWorldNameList = config.getStringList("game-worlds");
@@ -40,6 +42,7 @@ public class GameWorldConfig {
 			logger.severe("Failed to load game world: List of options is empty or doesn't exist");
 		} else {
 			World world = getRandomGameWorld(gameWorldNameList);
+			setPeaceful(world);
 			if (world == null) {
 				return;
 			}
@@ -90,6 +93,12 @@ public class GameWorldConfig {
 		}
 
 		return world;
+	}
+
+	private void setPeaceful(World world) {
+		if (world != null) {
+			world.setDifficulty(Difficulty.PEACEFUL);
+		}
 	}
 
 	public World getLobbyWorld() {

@@ -45,7 +45,7 @@ public class ConnectionListener implements Listener {
 		player.setHealth(20);
 
 		GameStage stage = plugin.getGameStage();
-		if (stage == GameStage.LOBBY) {
+		if (stage == GameStage.LOBBY || stage == GameStage.ERROR) {
 			event.setJoinMessage(ProtectTheEgg.formatMessage(
 					ChatColor.GREEN + player.getName() + ChatColor.GRAY + " is prepared to defend their egg!"));
 			plugin.setLobbyScoreboard(player);

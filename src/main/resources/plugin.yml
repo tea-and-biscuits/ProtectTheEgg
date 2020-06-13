@@ -3,6 +3,8 @@ version: 1.0.0
 name: ProtectTheEgg
 author: Harieo
 api-version: '1.15'
+depend:
+    - MinigamesCore
 
 permissions:
     quacktopia.minigames.join:

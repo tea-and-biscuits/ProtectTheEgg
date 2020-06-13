@@ -15,6 +15,7 @@ import uk.co.harieo.minigames.timing.LobbyTimer;
 import uk.co.harieo.quackbedwars.config.GameConfig;
 import uk.co.harieo.quackbedwars.config.GameWorldConfig;
 import uk.co.harieo.quackbedwars.listeners.ConnectionListener;
+import uk.co.harieo.quackbedwars.listeners.WorldProtectionListener;
 import uk.co.harieo.quackbedwars.scoreboard.PlayerCountElement;
 import uk.co.harieo.quackbedwars.scoreboard.TeamNameElement;
 
@@ -57,7 +58,8 @@ public class ProtectTheEgg extends Minigame {
 		}
 
 		setupScoreboard();
-		registerListeners(new ConnectionListener());
+		registerListeners(new ConnectionListener(), new WorldProtectionListener());
+		setGameStage(isDevelopmentMode ? GameStage.ERROR : GameStage.LOBBY);
 	}
 
 	private void setupScoreboard() {
