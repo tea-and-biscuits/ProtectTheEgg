@@ -1,16 +1,14 @@
 package uk.co.harieo.quackbedwars.teams;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import uk.co.harieo.quackbedwars.teams.upgrades.TeamUpgrade;
+import uk.co.harieo.quackbedwars.teams.upgrades.CurrencyUpgrade;
 
 public class TeamGameData {
 
 	private static final Map<BedWarsTeam, TeamGameData> data = new HashMap<>();
 
-	private final Set<TeamUpgrade> upgrades = new HashSet<>();
+	private CurrencyUpgrade currencyUpgrade;
 	private boolean eggIntact = true;
 
 	public TeamGameData(BedWarsTeam team) {
@@ -23,6 +21,14 @@ public class TeamGameData {
 
 	public void setEggIntact(boolean eggIntact) {
 		this.eggIntact = eggIntact;
+	}
+
+	public CurrencyUpgrade getCurrencyUpgrade() {
+		return currencyUpgrade;
+	}
+
+	public void setCurrencyUpgrade(CurrencyUpgrade currencyUpgrade) {
+		this.currencyUpgrade = currencyUpgrade;
 	}
 
 	public static TeamGameData getGameData(BedWarsTeam team) {
