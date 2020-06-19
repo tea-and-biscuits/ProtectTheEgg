@@ -31,6 +31,7 @@ public class TeamHandler {
 		unsetTeam(player);
 		playerTeams.put(player.getUniqueId(), team);
 		team.addMember(player);
+		TeamGameData.getGameData(team).incrementPlayersAlive();
 	}
 
 	public static void unsetTeam(Player player) {

@@ -33,7 +33,7 @@ public class GameWorldConfig {
 
 		String lobbyWorldName = config.getString("lobby-world");
 		if (lobbyWorldName == null) {
-			logger.severe("Failed to load lobby world: Not found in world container");
+			logger.severe("Failed to load lobby world: None provided");
 			return;
 		} else {
 			lobbyWorld = Bukkit.getWorld(lobbyWorldName);
@@ -52,7 +52,7 @@ public class GameWorldConfig {
 
 			try {
 				gameWorld = MapImpl.parseWorld(world);
-				parseTeamSpawns(gameWorld);
+				TeamSpawnHandler.parseSpawnLocations(gameWorld);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return;
@@ -97,17 +97,6 @@ public class GameWorldConfig {
 		}
 
 		return world;
-	}
-
-	private void parseTeamSpawns(MapImpl gameWorld) {
-		for (LocationPair pair : gameWorld.getLocationsByKey(TeamSpawnHandler.SPAWN_KEY)) {
-			BedWarsTeam team = BedWarsTeam.getBySpawnKey(pair.getValue());
-			if (team != null) {
-				TeamSpawnHandler.addSpawnLocation(team, pair.getLocation());
-			} else {
-				plugin.getLogger().warning("The game world has a spawn with an unknown team: " + pair.getValue());
-			}
-		}
 	}
 
 	private void setPeaceful(World world) {

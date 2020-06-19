@@ -3,6 +3,8 @@ package uk.co.harieo.quackbedwars.teams;
 import org.bukkit.Location;
 
 import java.util.*;
+import uk.co.harieo.minigames.maps.LocationPair;
+import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 
 public class TeamSpawnHandler {
@@ -11,6 +13,18 @@ public class TeamSpawnHandler {
 
 	private static final Map<BedWarsTeam, List<Location>> spawnLocations = new HashMap<>();
 	private static final Map<BedWarsTeam, Integer> lastIndexMap = new HashMap<>();
+
+	public static void parseSpawnLocations(MapImpl map) {
+		for (LocationPair pair : map.getLocationsByKey(TeamSpawnHandler.SPAWN_KEY)) {
+			BedWarsTeam team = BedWarsTeam.getBySpawnKey(pair.getValue());
+			if (team != null) {
+				addSpawnLocation(team, pair.getLocation());
+			} else {
+				ProtectTheEgg.getInstance().getLogger()
+						.warning("The game world has a spawn with an unknown team: " + pair.getValue());
+			}
+		}
+	}
 
 	public static List<Location> getSpawnLocations(BedWarsTeam team) {
 		return spawnLocations.getOrDefault(team, Collections.emptyList());

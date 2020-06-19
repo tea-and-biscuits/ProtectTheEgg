@@ -53,6 +53,10 @@ public enum BedWarsTeam {
 		return chatColor;
 	}
 
+	public String getFormattedName() {
+		return getChatColor() + getName() + " Team";
+	}
+
 	public Color getArmourColor() {
 		return armourColor;
 	}

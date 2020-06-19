@@ -18,6 +18,7 @@ import uk.co.harieo.quackbedwars.listeners.ConnectionListener;
 import uk.co.harieo.quackbedwars.listeners.WorldProtectionListener;
 import uk.co.harieo.quackbedwars.scoreboard.PlayerCountElement;
 import uk.co.harieo.quackbedwars.scoreboard.TeamNameElement;
+import uk.co.harieo.quackbedwars.stages.GameStartStage;
 
 public class ProtectTheEgg extends Minigame {
 
@@ -56,6 +57,8 @@ public class ProtectTheEgg extends Minigame {
 		} else {
 			lobbyTimer.setCountdownMessages(messages);
 		}
+		lobbyTimer.setPrefix(PREFIX);
+		lobbyTimer.setOnTimerEnd(end -> GameStartStage.startGame());
 
 		setupScoreboard();
 		registerListeners(new ConnectionListener(), new WorldProtectionListener());

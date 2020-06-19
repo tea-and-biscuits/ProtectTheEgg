@@ -10,6 +10,7 @@ public class TeamGameData {
 
 	private CurrencyUpgrade currencyUpgrade;
 	private boolean eggIntact = true;
+	private int playersAlive = 0;
 
 	public TeamGameData(BedWarsTeam team) {
 		data.put(team, this);
@@ -29,6 +30,22 @@ public class TeamGameData {
 
 	public void setCurrencyUpgrade(CurrencyUpgrade currencyUpgrade) {
 		this.currencyUpgrade = currencyUpgrade;
+	}
+
+	public int getPlayersAlive() {
+		return playersAlive;
+	}
+
+	public void incrementPlayersAlive() {
+		setPlayersAlive(getPlayersAlive() + 1);
+	}
+
+	public void decrementPlayersAlive() {
+		setPlayersAlive(getPlayersAlive() - 1);
+	}
+
+	public void setPlayersAlive(int playersAlive) {
+		this.playersAlive = playersAlive;
 	}
 
 	public static TeamGameData getGameData(BedWarsTeam team) {
