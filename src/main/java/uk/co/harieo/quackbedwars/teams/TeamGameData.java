@@ -2,13 +2,14 @@ package uk.co.harieo.quackbedwars.teams;
 
 import java.util.HashMap;
 import java.util.Map;
+import uk.co.harieo.quackbedwars.teams.upgrades.BaseCurrencyUpgrade;
 import uk.co.harieo.quackbedwars.teams.upgrades.CurrencyUpgrade;
 
 public class TeamGameData {
 
 	private static final Map<BedWarsTeam, TeamGameData> data = new HashMap<>();
 
-	private CurrencyUpgrade currencyUpgrade;
+	private CurrencyUpgrade currencyUpgrade = BaseCurrencyUpgrade.INSTANCE;
 	private boolean eggIntact = true;
 	private int playersAlive = 0;
 

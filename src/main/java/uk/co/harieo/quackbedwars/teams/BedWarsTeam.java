@@ -28,7 +28,6 @@ public enum BedWarsTeam {
 	GOLD("Orange", ChatColor.GOLD, Color.ORANGE, Material.ORANGE_STAINED_GLASS);
 
 	private final String name;
-	private final String spawnKey;
 	private final ChatColor chatColor;
 	private final Color armourColor;
 	private final Material cageMaterial;
@@ -37,7 +36,6 @@ public enum BedWarsTeam {
 
 	BedWarsTeam(String name, ChatColor chatColor, Color armourColor, Material cageMaterial) {
 		this.name = name;
-		this.spawnKey = name();
 		this.chatColor = chatColor;
 		this.armourColor = armourColor;
 		this.cageMaterial = cageMaterial;
@@ -77,10 +75,6 @@ public enum BedWarsTeam {
 		team.removeTeamMember(player);
 	}
 
-	public String getSpawnKey() {
-		return spawnKey;
-	}
-
 	public boolean isTeamActive() {
 		return ordinal() < ProtectTheEgg.getInstance().getGameConfig().getMaxTeams();
 	}
@@ -92,10 +86,6 @@ public enum BedWarsTeam {
 
 	public static BedWarsTeam getByName(String name) {
 		return getByPredicate(team -> team.getName().equalsIgnoreCase(name));
-	}
-
-	public static BedWarsTeam getBySpawnKey(String key) {
-		return getByPredicate(team -> team.getSpawnKey().equalsIgnoreCase(key));
 	}
 
 	private static BedWarsTeam getByPredicate(Predicate<BedWarsTeam> teamPredicate) {

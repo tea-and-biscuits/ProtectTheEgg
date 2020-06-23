@@ -12,6 +12,7 @@ import java.util.List;
 import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.currency.CurrencySpawnHandler;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
 
@@ -36,21 +37,35 @@ public class MapCommand implements CommandExecutor {
 				player.sendMessage(ProtectTheEgg
 						.formatMessage(ChatColor.RED + "Insufficient Arguments. Expected: /maps <subcommand>"));
 			} else {
-				String subCommand = args[0];
-				if (subCommand.equalsIgnoreCase(SET_SPAWN)) {
-					setSpawn(player, args);
-				} else if (subCommand.equalsIgnoreCase(AUTHOR)) {
-					author(player, args);
-				} else if (subCommand.equalsIgnoreCase(INFO)) {
-					info(player);
-				} else if (subCommand.equalsIgnoreCase(SET_NAME)) {
-					setName(player, args);
-				} else if (subCommand.equalsIgnoreCase(COMMIT)) {
-					commit(player);
-				} else if (subCommand.equals(DELETE_SPAWN)) {
-					deleteSpawn(player);
-				} else {
-					player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.RED + "Unrecognised sub-command: " + subCommand));
+				String subCommand = args[0].toLowerCase();
+				switch (subCommand) {
+					case SET_SPAWN:
+						setSpawn(player, args);
+						break;
+					case AUTHOR:
+						author(player, args);
+						break;
+					case INFO:
+						info(player);
+						break;
+					case SET_NAME:
+						setName(player, args);
+						break;
+					case COMMIT:
+						commit(player);
+						break;
+					case DELETE_SPAWN:
+						deleteSpawn(player);
+						break;
+					case ResourceSpawnSubcommands.SET_RESOURCE_SPAWN:
+						ResourceSpawnSubcommands.setResourceSpawnCommand(player, args);
+						break;
+					case ResourceSpawnSubcommands.DELETE_RESOURCE_SPAWN:
+						ResourceSpawnSubcommands.deleteResourceSpawnCommand(player);
+						break;
+					default:
+						player.sendMessage(
+								ProtectTheEgg.formatMessage(ChatColor.RED + "Unrecognised sub-command: " + subCommand));
 				}
 			}
 		}
@@ -82,17 +97,18 @@ public class MapCommand implements CommandExecutor {
 				// Overwrite any previous spawns with the requested team
 				for (LocationPair pair : map.getLocationPairs(location)) {
 					if (isTeamSpawn(pair)) {
-						pair.setValue(team.getSpawnKey()); // Replace it with this team
+						pair.setValue(team.getName()); // Replace it with this team
 					}
 				}
 			} else {
-				map.addLocation(location, TeamSpawnHandler.SPAWN_KEY, team.getSpawnKey());
+				map.addLocation(location, TeamSpawnHandler.SPAWN_KEY, team.getName());
 			}
 
 			player.sendMessage(ProtectTheEgg.formatMessage(
 					ChatColor.GRAY + "Set current location to a " + team.getChatColor() + team.getName() + " "
 							+ ChatColor.GRAY
 							+ "spawn point!"));
+			TeamSpawnHandler.addSpawnLocation(team, location); // Caches the location so it doesn't need re-parsing
 		}
 	}
 
@@ -105,6 +121,11 @@ public class MapCommand implements CommandExecutor {
 				if (isTeamSpawn(pair)) {
 					map.removeLocation(pair);
 					removedOnce = true;
+
+					BedWarsTeam team = BedWarsTeam.getByName(pair.getValue());
+					if (team != null) {
+						TeamSpawnHandler.removeSpawnLocation(team, pair.getLocation()); // Removes from the cache
+					}
 				}
 			}
 
@@ -112,7 +133,8 @@ public class MapCommand implements CommandExecutor {
 				player.sendMessage(ProtectTheEgg.formatMessage(
 						ChatColor.GRAY + "The spawn at your location has been " + ChatColor.RED + "deleted"));
 			} else {
-				player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.RED + "There is no spawn marked at your location"));
+				player.sendMessage(
+						ProtectTheEgg.formatMessage(ChatColor.RED + "There is no spawn marked at your location"));
 			}
 		} else {
 			player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.RED + "There is no spawn at your location!"));
@@ -149,7 +171,8 @@ public class MapCommand implements CommandExecutor {
 				add = false;
 			} else {
 				player.sendMessage(
-						ProtectTheEgg.formatMessage(ChatColor.RED + "Neither add nor remove was specified: " + addRemove));
+						ProtectTheEgg
+								.formatMessage(ChatColor.RED + "Neither add nor remove was specified: " + addRemove));
 				return;
 			}
 
@@ -176,7 +199,8 @@ public class MapCommand implements CommandExecutor {
 	private void setName(Player player, String[] args) {
 		if (args.length < 2) {
 			player.sendMessage(
-					ProtectTheEgg.formatMessage(ChatColor.RED + "Insufficient Arguments. Expected: /maps setname <name>"));
+					ProtectTheEgg
+							.formatMessage(ChatColor.RED + "Insufficient Arguments. Expected: /maps setname <name>"));
 		} else {
 			StringBuilder nameBuilder = new StringBuilder();
 			for (int i = 1; i < args.length; i++) {
@@ -195,8 +219,56 @@ public class MapCommand implements CommandExecutor {
 	private void info(Player player) {
 		MapImpl map = MapImpl.get(player.getWorld());
 
-		boolean hasName = map.getFullName() != null;
-		boolean hasAuthor = !map.getAuthors().isEmpty();
+		boolean isValid = true;
+
+		if (map.getFullName() != null) {
+			player.sendMessage(
+					ProtectTheEgg.formatMessage(ChatColor.GREEN + "The map has a name (" + map.getFullName() + ")"));
+		} else {
+			player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.RED + "The map does not have a name!"));
+			isValid = false;
+		}
+
+		if (!map.getAuthors().isEmpty()) {
+			player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.GREEN + "The map has at least 1 author"));
+		} else {
+			player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.RED + "The map doesn't have any authors!"));
+			isValid = false;
+		}
+
+		BedWarsTeam[] teams = BedWarsTeam.values();
+		int teamsWithSpawns = 0;
+		for (BedWarsTeam team : teams) {
+			if (!TeamSpawnHandler.getSpawnLocations(team).isEmpty()) {
+				teamsWithSpawns++;
+			}
+		}
+
+		if (teamsWithSpawns < 3) {
+			player.sendMessage(ProtectTheEgg.formatMessage(
+					ChatColor.RED + "There are less than 3 teams with valid spawns (" + teamsWithSpawns + ")"));
+			isValid = false;
+		} else if (teamsWithSpawns < teams.length / 2) {
+			player.sendMessage(ProtectTheEgg
+					.formatMessage(ChatColor.YELLOW + "Less than half of teams have spawns (" + teamsWithSpawns + ")"));
+		} else {
+			player.sendMessage(ProtectTheEgg
+					.formatMessage(ChatColor.GREEN + "There are " + teamsWithSpawns + " team(s) with valid spawns"));
+		}
+
+		if (!CurrencySpawnHandler.getSpawnerLocations().isEmpty()) {
+			player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.GREEN + "There is at least 1 currency spawner"));
+		} else {
+			player.sendMessage(ProtectTheEgg.formatMessage(
+					ChatColor.RED + "There are no currency spawners set. Use /maps setresource <currency/team>"));
+			isValid = false;
+		}
+
+		if (isValid) {
+			player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.GREEN + "This map is valid and can be used with /maps commit"));
+		} else {
+			player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.RED + "This map is not valid, please see above for errors!"));
+		}
 	}
 
 	private void commit(Player player) {

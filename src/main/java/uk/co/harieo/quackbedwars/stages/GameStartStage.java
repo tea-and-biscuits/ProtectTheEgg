@@ -67,9 +67,9 @@ public class GameStartStage {
 			if (team == null) {
 				team = TeamHandler.assignTeam(player);
 				if (team == null) {
-					player.sendMessage(
-							ProtectTheEgg.formatMessage(ChatColor.RED + "An error has occurred assigning you a team!"));
-					throw new IllegalStateException("Failed to assign " + player.getName() + " a team");
+					player.kickPlayer(ChatColor.RED + "An error has occurred assigning you a team!");
+					plugin.getLogger().severe("Failed to assign " + player.getName() + " a team");
+					continue;
 				} else {
 					player.sendMessage(ProtectTheEgg.formatMessage(
 							ChatColor.GRAY + "You have been auto-magically assigned to the " + team.getChatColor()
@@ -82,6 +82,11 @@ public class GameStartStage {
 		}
 
 		activateScoreboards();
+	}
+
+	private static void releasePlayers(ProtectTheEgg plugin) {
+		plugin.setGameStage(GameStage.IN_GAME);
+		CurrencySpawnHandler.startSpawning();
 	}
 
 	private static int scoreboardSwitchTimer = 0;

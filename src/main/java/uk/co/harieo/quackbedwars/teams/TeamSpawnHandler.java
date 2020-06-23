@@ -16,7 +16,7 @@ public class TeamSpawnHandler {
 
 	public static void parseSpawnLocations(MapImpl map) {
 		for (LocationPair pair : map.getLocationsByKey(TeamSpawnHandler.SPAWN_KEY)) {
-			BedWarsTeam team = BedWarsTeam.getBySpawnKey(pair.getValue());
+			BedWarsTeam team = BedWarsTeam.getByName(pair.getValue());
 			if (team != null) {
 				addSpawnLocation(team, pair.getLocation());
 			} else {
@@ -37,6 +37,12 @@ public class TeamSpawnHandler {
 			List<Location> locations = new ArrayList<>();
 			locations.add(location);
 			spawnLocations.put(team, locations);
+		}
+	}
+
+	public static void removeSpawnLocation(BedWarsTeam team, Location location) {
+		if (spawnLocations.containsKey(team)) {
+			spawnLocations.get(team).remove(location);
 		}
 	}
 

@@ -6,6 +6,13 @@ api-version: '1.15'
 depend:
     - MinigamesCore
 
+commands:
+    map:
+        description: 'Allows you to format the map for this gamemode'
+        permission: 'quacktopia.minigames.maps'
+        aliases:
+            - maps
+
 permissions:
     quacktopia.minigames.join:
         description: 'Allows joining mid-game'

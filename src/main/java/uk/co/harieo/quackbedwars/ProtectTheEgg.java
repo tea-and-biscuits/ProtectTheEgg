@@ -12,6 +12,7 @@ import uk.co.harieo.minigames.games.Minigame;
 import uk.co.harieo.minigames.scoreboards.GameBoard;
 import uk.co.harieo.minigames.scoreboards.elements.ConstantElement;
 import uk.co.harieo.minigames.timing.LobbyTimer;
+import uk.co.harieo.quackbedwars.commands.MapCommand;
 import uk.co.harieo.quackbedwars.config.GameConfig;
 import uk.co.harieo.quackbedwars.config.GameWorldConfig;
 import uk.co.harieo.quackbedwars.listeners.ConnectionListener;
@@ -62,6 +63,7 @@ public class ProtectTheEgg extends Minigame {
 
 		setupScoreboard();
 		registerListeners(new ConnectionListener(), new WorldProtectionListener());
+		registerCommand(new MapCommand(), "map", "maps");
 		setGameStage(isDevelopmentMode ? GameStage.ERROR : GameStage.LOBBY);
 	}
 

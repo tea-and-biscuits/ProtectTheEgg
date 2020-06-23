@@ -13,10 +13,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
-import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.currency.CurrencySpawnHandler;
 import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
 
 public class GameWorldConfig {
@@ -53,6 +52,7 @@ public class GameWorldConfig {
 			try {
 				gameWorld = MapImpl.parseWorld(world);
 				TeamSpawnHandler.parseSpawnLocations(gameWorld);
+				CurrencySpawnHandler.parseSpawnerLocations(gameWorld);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return;
