@@ -12,6 +12,11 @@ commands:
         permission: 'quacktopia.minigames.maps'
         aliases:
             - maps
+    force:
+        description: 'Allows you to force start a game'
+        permission: 'quacktopia.minigames.force'
+        aliases:
+            - forcestart
 
 permissions:
     quacktopia.minigames.join:
@@ -19,4 +24,7 @@ permissions:
         default: op
     quacktopia.minigames.maps:
         description: 'Allows using /maps command'
+        default: op
+    quacktopia.minigames.force:
+        description: 'Allows you to use /force to force start the game'
         default: op
