@@ -31,4 +31,8 @@ public enum Statistic {
 		return playerStatistics.getOrDefault(player.getUniqueId(), 0);
 	}
 
+	public void addValue(Player player, int addition) {
+		setValue(player, getValue(player) + addition);
+	}
+
 }

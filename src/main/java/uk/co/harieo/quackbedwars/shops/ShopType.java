@@ -45,4 +45,19 @@ public enum ShopType {
 		return villagerProfession;
 	}
 
+	/**
+	 * Retrieves a type by its {@link #getMapValue()} which matches the specified value
+	 *
+	 * @param mapValue to be compared to other types
+	 * @return the retrieved type or null if none match
+	 */
+	public static ShopType getByMapValue(String mapValue) {
+		for (ShopType type : values()) {
+			if (type.getMapValue().equals(mapValue)) {
+				return type;
+			}
+		}
+		return null;
+	}
+
 }

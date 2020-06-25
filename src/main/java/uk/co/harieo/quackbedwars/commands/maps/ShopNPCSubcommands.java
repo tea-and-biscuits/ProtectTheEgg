@@ -35,6 +35,16 @@ public class ShopNPCSubcommands implements Subcommand {
 	public void onSubcommand(CommandSender sender, String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
+			switch (label.toLowerCase()) {
+				case "setshop":
+					setShopSubcommand(player, args);
+					break;
+				case "deleteshop":
+					deleteShopSubcommand(player);
+					break;
+				default:
+					throw new IllegalArgumentException("Provided sub-command with unrecognised alias");
+			}
 		}
 	}
 
@@ -73,6 +83,9 @@ public class ShopNPCSubcommands implements Subcommand {
 			}
 
 			map.addLocation(location, ShopHandler.SHOP_SPAWN_KEY, type.getMapValue());
+			player.sendMessage(ProtectTheEgg.formatMessage(
+					ChatColor.GRAY + "You have set this to a " + ChatColor.LIGHT_PURPLE + type.getShopName()
+							+ ChatColor.GRAY + " spawn point!"));
 		}
 	}
 

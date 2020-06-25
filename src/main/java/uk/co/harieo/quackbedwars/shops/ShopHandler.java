@@ -24,8 +24,8 @@ public class ShopHandler {
 		int successes = 0;
 		for (LocationPair pair : map.getLocationsByKey(SHOP_SPAWN_KEY)) {
 			String rawType = pair.getValue();
-			try {
-				ShopType type = ShopType.valueOf(rawType);
+			ShopType type = ShopType.getByMapValue(rawType);
+			if (type != null) {
 				Location location = pair.getLocation();
 				World world = location.getWorld();
 				if (world != null) {
@@ -37,7 +37,7 @@ public class ShopHandler {
 				} else {
 					logger.warning("Failed to load shop spawn because the location was missing a world");
 				}
-			} catch (IllegalArgumentException ignored) {
+			} else {
 				logger.warning("Failed to load shop spawn due to invalid type: " + rawType);
 			}
 		}

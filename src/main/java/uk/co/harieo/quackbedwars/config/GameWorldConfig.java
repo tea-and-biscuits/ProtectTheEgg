@@ -158,14 +158,17 @@ public class GameWorldConfig {
 	 * @param plugin which is requesting the temporary world be unloaded
 	 */
 	public void unloadTemporaryWorld(JavaPlugin plugin) {
-		World gameWorld = this.gameWorld.getWorld();
-		if (gameWorld != null) {
-			Bukkit.unloadWorld(gameWorld, false);
-			try {
-				FileUtils.deleteDirectory(gameWorldDirectory);
-				plugin.getLogger().info("Deleted temporary game world successfully!");
-			} catch (IOException e) {
-				e.printStackTrace();
+		MapImpl gameMap = this.gameWorld;
+		if (gameMap != null) {
+			World gameWorld = gameMap.getWorld();
+			if (gameWorld != null) {
+				Bukkit.unloadWorld(gameWorld, false);
+				try {
+					FileUtils.deleteDirectory(gameWorldDirectory);
+					plugin.getLogger().info("Deleted temporary game world successfully!");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

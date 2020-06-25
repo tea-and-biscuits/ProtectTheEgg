@@ -11,14 +11,15 @@ import uk.co.harieo.minigames.games.GameStage;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.minigames.scoreboards.GameBoard;
 import uk.co.harieo.minigames.scoreboards.elements.ConstantElement;
+import uk.co.harieo.minigames.timing.GameTimer;
 import uk.co.harieo.minigames.timing.Timer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnHandler;
+import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.PlayerEffects;
 import uk.co.harieo.quackbedwars.players.Statistic;
-import uk.co.harieo.quackbedwars.scoreboard.EggStatusElement;
+import uk.co.harieo.quackbedwars.scoreboard.PlayersLeftElement;
 import uk.co.harieo.quackbedwars.scoreboard.StatisticsElement;
-import uk.co.harieo.quackbedwars.scoreboard.TeamNameElement;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamHandler;
 import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
@@ -27,16 +28,24 @@ public class GameStartStage {
 
 	private static final GameBoard mainScoreboard = new GameBoard(
 			ChatColor.GOLD + ChatColor.BOLD.toString() + "Protect the Egg", DisplaySlot.SIDEBAR);
+	private static final GameTimer gameTimer = new GameTimer(ProtectTheEgg.getInstance(), 20 * 60 * 20);
 
 	static {
 		mainScoreboard.addBlankLine();
-		mainScoreboard.addLine(new TeamNameElement(true));
-		mainScoreboard.addLine(new EggStatusElement());
+		mainScoreboard.addLine(new ConstantElement(ChatColor.GREEN + ChatColor.BOLD.toString() + "Time Left"));
+		mainScoreboard.addLine(gameTimer);
+		mainScoreboard.addBlankLine();
+		mainScoreboard.addLine(new ConstantElement(ChatColor.YELLOW + ChatColor.BOLD.toString() + "Players Left"));
+		mainScoreboard.addLine(new PlayersLeftElement());
 		mainScoreboard.addBlankLine();
 		mainScoreboard.addLine(new ConstantElement(ChatColor.GREEN + ChatColor.BOLD.toString() + "Your Kills"));
 		mainScoreboard.addLine(new StatisticsElement(Statistic.KILLS));
 		mainScoreboard.addBlankLine();
 		mainScoreboard.addLine(ProtectTheEgg.IP_ELEMENT);
+
+		gameTimer.setPrefix(ProtectTheEgg.PREFIX);
+		gameTimer.setOnTimerTick(GameStartStage::onTick);
+		// TODO onEnd
 	}
 
 	public static void startGame() {
@@ -69,6 +78,7 @@ public class GameStartStage {
 
 			player.teleport(Objects.requireNonNull(TeamSpawnHandler.getSpawn(team),
 					"No spawn available for " + team.getName() + " team"));
+			DeathTracker.markAlive(player);
 		}
 
 		int seconds = 5;
@@ -88,6 +98,10 @@ public class GameStartStage {
 
 	private static void releasePlayers(ProtectTheEgg plugin) {
 		plugin.setGameStage(GameStage.IN_GAME);
+	}
+
+	private static void onTick(int tick) {
+
 	}
 
 }

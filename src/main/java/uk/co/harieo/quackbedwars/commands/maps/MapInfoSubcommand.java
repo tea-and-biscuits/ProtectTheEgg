@@ -96,11 +96,10 @@ public class MapInfoSubcommand implements Subcommand {
 					.formatMessage(ChatColor.GREEN + "There are " + teamsWithSpawns + " team(s) with valid spawns"));
 		}
 
-		// If there are less egg spawns than player spawns, players will spawn without an egg
-		if (teamsWithEggs < teamsWithSpawns) {
+		if (teamsWithEggs < halfAmountOfTeams) {
 			player.sendMessage(ProtectTheEgg
 					.formatMessage(ChatColor.RED
-							+ "There are less egg spawn locations than teams with player spawn locations!"));
+							+ "Less than half of teams have an egg spawn location!"));
 			isValid = false;
 		} else {
 			player.sendMessage(

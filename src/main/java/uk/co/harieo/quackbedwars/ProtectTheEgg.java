@@ -16,8 +16,10 @@ import uk.co.harieo.quackbedwars.commands.ForceStartCommand;
 import uk.co.harieo.quackbedwars.commands.MapCommand;
 import uk.co.harieo.quackbedwars.config.GameConfig;
 import uk.co.harieo.quackbedwars.config.GameWorldConfig;
+import uk.co.harieo.quackbedwars.egg.EggListener;
 import uk.co.harieo.quackbedwars.listeners.ConnectionListener;
 import uk.co.harieo.quackbedwars.listeners.WorldProtectionListener;
+import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.scoreboard.PlayerCountElement;
 import uk.co.harieo.quackbedwars.scoreboard.TeamNameElement;
 import uk.co.harieo.quackbedwars.stages.GameStartStage;
@@ -63,7 +65,7 @@ public class ProtectTheEgg extends Minigame {
 		lobbyTimer.setOnTimerEnd(end -> GameStartStage.startGame());
 
 		setupScoreboard();
-		registerListeners(new ConnectionListener(), new WorldProtectionListener());
+		registerListeners(new ConnectionListener(), new WorldProtectionListener(), new EggListener(), new DeathTracker());
 		registerCommand(new MapCommand(), "map", "maps");
 		registerCommand(new ForceStartCommand(), "force", "forcestart");
 		setGameStage(isDevelopmentMode ? GameStage.ERROR : GameStage.LOBBY);
