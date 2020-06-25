@@ -16,12 +16,12 @@ public enum Currency {
 	private final CurrencySpawnRate baseSpawnRate;
 	private final boolean teamBased;
 
-	Currency(String name, ChatColor color, Material itemMaterial, int baseSpawnsPerSecond, int baseAmountPerSpawn,
+	Currency(String name, ChatColor color, Material itemMaterial, int baseSecondsPerSpawn, int baseAmountPerSpawn,
 			boolean isTeamBased) {
 		this.name = name;
 		this.color = color;
 		this.material = itemMaterial;
-		this.baseSpawnRate = new CurrencySpawnRate(this, baseAmountPerSpawn, baseAmountPerSpawn);
+		this.baseSpawnRate = new CurrencySpawnRate(this, baseSecondsPerSpawn, baseAmountPerSpawn);
 		this.teamBased = isTeamBased;
 	}
 

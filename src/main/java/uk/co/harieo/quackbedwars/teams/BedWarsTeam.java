@@ -1,5 +1,6 @@
 package uk.co.harieo.quackbedwars.teams;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -39,8 +40,7 @@ public enum BedWarsTeam {
 		this.chatColor = chatColor;
 		this.armourColor = armourColor;
 		this.cageMaterial = cageMaterial;
-		this.team = new Team(name, chatColor, armourColor,
-				ProtectTheEgg.getInstance().getGameConfig().getPlayersPerTeam());
+		this.team = new Team(name, chatColor, armourColor, Bukkit.getMaxPlayers()); // Max players is handled elsewhere
 	}
 
 	public String getName() {

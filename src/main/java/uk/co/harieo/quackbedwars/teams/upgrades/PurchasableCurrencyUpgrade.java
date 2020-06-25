@@ -1,7 +1,9 @@
 package uk.co.harieo.quackbedwars.teams.upgrades;
 
 import com.google.common.collect.Sets;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
@@ -20,17 +22,20 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 	private final String name;
 	private final int diamondCost;
 	private final PurchasableCurrencyUpgrade parent;
-	private final Set<CurrencySpawnRate> newSpawnRates;
+	private final Map<Currency, CurrencySpawnRate> spawnRates = new HashMap<>(); // Key prevents duplicate spawn rates
 
 	PurchasableCurrencyUpgrade(String name, int diamondCost, PurchasableCurrencyUpgrade parent, CurrencySpawnRate... newSpawnRates) {
 		this.name = name;
 		this.diamondCost = diamondCost;
 		this.parent = parent;
 
-		this.newSpawnRates = new HashSet<>();
-		this.newSpawnRates.addAll(Sets.newHashSet(newSpawnRates)); // Add the new ones for this upgrade
+		// Add the new ones for this upgrade
+		for (CurrencySpawnRate spawnRate : newSpawnRates) {
+			this.spawnRates.put(spawnRate.getCurrency(), spawnRate);
+		}
+
 		if (parent != null) {
-			this.newSpawnRates.addAll(parent.getChangedSpawnRates()); // And all the ones before it (from the parent)
+			this.spawnRates.putAll(parent.getChangedSpawnRates()); // And all the ones before it (from the parent)
 		}
 	}
 
@@ -49,8 +54,8 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 	}
 
 	@Override
-	public Set<CurrencySpawnRate> getChangedSpawnRates() {
-		return newSpawnRates;
+	public Map<Currency, CurrencySpawnRate> getChangedSpawnRates() {
+		return spawnRates;
 	}
 
 	public PurchasableCurrencyUpgrade getParent() {

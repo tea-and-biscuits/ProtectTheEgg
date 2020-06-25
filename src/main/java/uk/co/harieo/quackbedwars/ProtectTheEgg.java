@@ -69,6 +69,12 @@ public class ProtectTheEgg extends Minigame {
 		setGameStage(isDevelopmentMode ? GameStage.ERROR : GameStage.LOBBY);
 	}
 
+	@Override
+	public void onDisable() {
+		getLogger().info("Deleting temporary game world...");
+		getGameWorldConfig().unloadTemporaryWorld(this);
+	}
+
 	private void setupScoreboard() {
 		lobbyScoreboard.addBlankLine();
 		lobbyScoreboard.addLine(new ConstantElement(ChatColor.GREEN + ChatColor.BOLD.toString() + "Players"));

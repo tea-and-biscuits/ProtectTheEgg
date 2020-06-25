@@ -11,13 +11,14 @@ import uk.co.harieo.minigames.games.GameStage;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.minigames.scoreboards.GameBoard;
 import uk.co.harieo.minigames.scoreboards.elements.ConstantElement;
+import uk.co.harieo.minigames.timing.Timer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnHandler;
+import uk.co.harieo.quackbedwars.players.PlayerEffects;
 import uk.co.harieo.quackbedwars.players.Statistic;
 import uk.co.harieo.quackbedwars.scoreboard.EggStatusElement;
 import uk.co.harieo.quackbedwars.scoreboard.StatisticsElement;
 import uk.co.harieo.quackbedwars.scoreboard.TeamNameElement;
-import uk.co.harieo.quackbedwars.scoreboard.TeamStatusElement;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamHandler;
 import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
@@ -25,8 +26,6 @@ import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
 public class GameStartStage {
 
 	private static final GameBoard mainScoreboard = new GameBoard(
-			ChatColor.GOLD + ChatColor.BOLD.toString() + "Protect the Egg", DisplaySlot.SIDEBAR);
-	private static final GameBoard teamStatusScoreboard = new GameBoard(
 			ChatColor.GOLD + ChatColor.BOLD.toString() + "Protect the Egg", DisplaySlot.SIDEBAR);
 
 	static {
@@ -38,15 +37,6 @@ public class GameStartStage {
 		mainScoreboard.addLine(new StatisticsElement(Statistic.KILLS));
 		mainScoreboard.addBlankLine();
 		mainScoreboard.addLine(ProtectTheEgg.IP_ELEMENT);
-
-		teamStatusScoreboard.addBlankLine();
-		teamStatusScoreboard.addLine(new ConstantElement(ChatColor.GREEN + ChatColor.BOLD.toString() + "Teams"));
-		BedWarsTeam[] teams = BedWarsTeam.values();
-		for (int i = 0; i < 10 && i < teams.length; i++) {
-			teamStatusScoreboard.addLine(new TeamStatusElement(teams[i]));
-		}
-		teamStatusScoreboard.addBlankLine();
-		teamStatusScoreboard.addLine(ProtectTheEgg.IP_ELEMENT);
 	}
 
 	public static void startGame() {
@@ -81,40 +71,23 @@ public class GameStartStage {
 					"No spawn available for " + team.getName() + " team"));
 		}
 
-		activateScoreboards();
+		int seconds = 5;
+		CurrencySpawnHandler.startSpawning(seconds * 20);
+		new Timer(ProtectTheEgg.getInstance(), seconds)
+				.setOnTimerEnd(end -> releasePlayers(plugin))
+				.setOnTimerTick(tick -> {
+					int secondsLeft = seconds - tick;
+					if (secondsLeft <= 3 && secondsLeft > 0) {
+						Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
+								ChatColor.GRAY + "Dropping in " + ChatColor.YELLOW + secondsLeft + " second" + (
+										secondsLeft != 1 ? "s" : "")));
+						PlayerEffects.pingAll();
+					}
+				}).start();
 	}
 
 	private static void releasePlayers(ProtectTheEgg plugin) {
 		plugin.setGameStage(GameStage.IN_GAME);
-		CurrencySpawnHandler.startSpawning();
-	}
-
-	private static int scoreboardSwitchTimer = 0;
-
-	private static void activateScoreboards() {
-		Bukkit.getScheduler().runTaskTimer(ProtectTheEgg.getInstance(), () -> {
-			GameBoard toCancel = null;
-			GameBoard toSwitchTo = null;
-			if (scoreboardSwitchTimer == 5) {
-				toCancel = mainScoreboard;
-				toSwitchTo = teamStatusScoreboard;
-			} else if (scoreboardSwitchTimer == 0) {
-				toCancel = teamStatusScoreboard;
-				toSwitchTo = mainScoreboard;
-			} else if (scoreboardSwitchTimer == 7) {
-				scoreboardSwitchTimer = 0;
-				return;
-			}
-
-			if (toCancel != null) {
-				for (Player player : Bukkit.getOnlinePlayers()) {
-					toCancel.cancelScoreboard(player);
-					toSwitchTo.render(ProtectTheEgg.getInstance(), player, 20);
-				}
-			}
-
-			scoreboardSwitchTimer++;
-		}, 20, 20);
 	}
 
 }

@@ -1,7 +1,6 @@
 package uk.co.harieo.quackbedwars.currency;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
@@ -44,12 +43,11 @@ public class CurrencySpawnHandler {
 		int successes = 0;
 		for (LocationPair pair : map.getLocationsByKey(TEAM_SPAWN_KEY)) {
 			String teamName = pair.getValue();
-			BedWarsTeam team = BedWarsTeam.getByName(teamName);
-			if (team != null) {
-				Location location = pair.getLocation();
-				addSpawner(location, new TeamSpawner(location, team));
+			try {
+				BedWarsTeam team = BedWarsTeam.valueOf(teamName);
+				addSpawner(pair.getLocation(), new TeamSpawner(team));
 				successes++;
-			} else {
+			} catch (IllegalArgumentException ignored) {
 				logger.warning("Failed to parse team spawn due to unknown team: " + teamName);
 			}
 		}
@@ -65,8 +63,7 @@ public class CurrencySpawnHandler {
 			String currencyName = pair.getValue();
 			try {
 				Currency currency = Currency.valueOf(currencyName);
-				Location location = pair.getLocation();
-				addSpawner(location, new SingleCurrencySpawner(location, currency));
+				addSpawner(pair.getLocation(), new SingleCurrencySpawner(currency));
 				successes++;
 			} catch (IllegalArgumentException ignored) {
 				logger.warning("Failed to parse currency spawn due to unknown currency: " + currencyName);
@@ -77,7 +74,12 @@ public class CurrencySpawnHandler {
 	}
 
 	public static void addSpawner(Location location, CurrencySpawner spawnerInfo) {
-		spawnerLocations.put(location, spawnerInfo);
+		Location clonedLocation = location.clone();
+		// Center the location and raise it 1 off the floor for precision
+		clonedLocation.setX(clonedLocation.getBlockX() + 0.5);
+		clonedLocation.setY(clonedLocation.getBlockY() + 1.0);
+		clonedLocation.setZ(clonedLocation.getBlockZ() + 0.5);
+		spawnerLocations.put(clonedLocation, spawnerInfo);
 	}
 
 	public static void removeSpawner(Location location) {
@@ -88,23 +90,23 @@ public class CurrencySpawnHandler {
 		return spawnerLocations;
 	}
 
-	public static void startSpawning() {
+	/**
+	 * Sets up the resource spawner holograms and begins to spawn resources based on their respective spawn rates
+	 *
+	 * @param ticksDelay the amount of ticks before items are dropped
+	 */
+	public static void startSpawning(int ticksDelay) {
 		if (spawningTask == null) { // Make sure this hasn't already happened
 			for (Entry<Location, CurrencySpawner> spawners : spawnerLocations.entrySet()) {
-				Location location = spawners.getKey();
+				Location location = spawners.getKey().clone();
 				World world = location.getWorld();
 				if (world == null) {
 					throw new NullPointerException("No world in currency spawner location");
 				}
 
-				Location raisedLocation = new Location(world, location.getBlockX() + 0.5,
-						location.getBlockY() + 2.0, location.getBlockZ() + 0.5);
-
-				ArmorStand hologramStand = (ArmorStand) world.spawnEntity(raisedLocation, EntityType.ARMOR_STAND);
-				hologramStand.setGravity(false);
-				hologramStand.setVisible(false);
-				hologramStand.setCustomName(spawners.getValue().getHologramName());
-				hologramStand.setCustomNameVisible(true);
+				CurrencySpawner spawner = spawners.getValue();
+				spawner.getHologram().setLocation(location);
+				spawner.formatHologram();
 			}
 
 			spawningTask = Bukkit.getScheduler().runTaskTimer(ProtectTheEgg.getInstance(), () -> {
@@ -112,19 +114,13 @@ public class CurrencySpawnHandler {
 					CurrencySpawner spawner = spawners.getValue();
 					for (CurrencySpawnRate spawnRate : spawner.getSpawnRates()) {
 						if (spawnRate.getInternalSecond() == spawnRate.getSecondsPerSpawn()) {
-							Location location = spawners.getKey();
-							World world = location.getWorld();
-							if (world != null) {
-								Currency currency = spawnRate.getCurrency();
-								world.dropItem(location,
-										new ItemStack(currency.getMaterial(), spawnRate.getAmountPerSpawn()));
-							}
+							spawnRate.dropItems(spawners.getKey());
 						}
 
 						spawnRate.incrementInternalSecond();
 					}
 				}
-			}, 0, 20);
+			}, ticksDelay, 20);
 		}
 	}
 

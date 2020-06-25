@@ -59,7 +59,8 @@ public class ConnectionListener implements Listener {
 			// TODO set game scoreboard
 
 			player.sendMessage(
-					ProtectTheEgg.formatMessage(ChatColor.GRAY + "You have joined mid-game so we've made you a spectator!"));
+					ProtectTheEgg
+							.formatMessage(ChatColor.GRAY + "You have joined mid-game so we've made you a spectator!"));
 			Bukkit.getOnlinePlayers().forEach(onlinePlayer -> onlinePlayer.hidePlayer(plugin, player));
 		}
 	}
@@ -69,12 +70,16 @@ public class ConnectionListener implements Listener {
 		Player player = event.getPlayer();
 		ProtectTheEgg plugin = ProtectTheEgg.getInstance();
 
-		event.setQuitMessage(ChatColor.RED + player.getName() + ChatColor.GRAY + " has flown away from the nest!");
+		event.setQuitMessage(ProtectTheEgg
+				.formatMessage(ChatColor.RED + player.getName() + ChatColor.GRAY + " has flown away from the nest!"));
 		TeamHandler.unsetTeam(player);
 
-		if (plugin.getGameStage() == GameStage.LOBBY) {
-			int playerCount = Bukkit.getOnlinePlayers().size() - 1;
+		int playerCount = Bukkit.getOnlinePlayers().size() - 1;
+		GameStage stage = plugin.getGameStage();
+		if (stage == GameStage.LOBBY) {
 			updateTimer(plugin, playerCount);
+		} else if (stage != GameStage.ERROR) { // If there is an error, the server may need to be up for repairs
+			Bukkit.getServer().shutdown();
 		}
 	}
 

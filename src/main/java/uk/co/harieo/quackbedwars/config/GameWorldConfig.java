@@ -16,6 +16,8 @@ import org.apache.commons.io.FileUtils;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnHandler;
+import uk.co.harieo.quackbedwars.egg.EggData;
+import uk.co.harieo.quackbedwars.shops.ShopHandler;
 import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
 
 public class GameWorldConfig {
@@ -23,9 +25,16 @@ public class GameWorldConfig {
 	private final JavaPlugin plugin;
 	private World lobbyWorld;
 	private MapImpl gameWorld;
+	private File gameWorldDirectory;
 
 	private boolean loaded = false;
 
+	/**
+	 * A handler which reads the config.yml file and parses selected worlds for all necessary game locations/data
+	 *
+	 * @param plugin which is running this game
+	 * @param config which represents the config.yml file
+	 */
 	public GameWorldConfig(JavaPlugin plugin, FileConfiguration config) {
 		this.plugin = plugin;
 		Logger logger = plugin.getLogger();
@@ -53,6 +62,8 @@ public class GameWorldConfig {
 				gameWorld = MapImpl.parseWorld(world);
 				TeamSpawnHandler.parseSpawnLocations(gameWorld);
 				CurrencySpawnHandler.parseSpawnerLocations(gameWorld);
+				EggData.parseEggLocations(gameWorld);
+				ShopHandler.parseShopSpawns(gameWorld);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return;
@@ -62,6 +73,13 @@ public class GameWorldConfig {
 		}
 	}
 
+	/**
+	 * Retrieves a random world name from a specified list of possibilities then retrives that world from Bukkit, loading
+	 * it if necessary
+	 *
+	 * @param gameWorldNameList the list of world name possibilities
+	 * @return the loaded game world
+	 */
 	private World getRandomGameWorld(List<String> gameWorldNameList) {
 		Logger logger = plugin.getLogger();
 
@@ -75,14 +93,17 @@ public class GameWorldConfig {
 				File file = new File(Bukkit.getWorldContainer(), gameWorldName);
 				if (file.exists()) {
 					logger.warning("Temporary world was already cached, attempting to destroy for safety");
-					if (!file.delete()) {
-						logger.severe("Failed to load game world: Failed to delete already cached temporary world");
+					try {
+						FileUtils.deleteDirectory(file);
+					} catch (IOException e) {
+						e.printStackTrace();
 						return null;
 					}
 				}
 
 				try {
 					FileUtils.copyDirectory(worldFolder, file);
+					this.gameWorldDirectory = file;
 					world = Bukkit.createWorld(new WorldCreator(gameWorldName)); // Loads the new temporary world
 					logger.info("Loaded game world as temporary directory: " + gameWorldName);
 				} catch (IOException e) {
@@ -99,22 +120,54 @@ public class GameWorldConfig {
 		return world;
 	}
 
+	/**
+	 * Sets a {@link World} to Peaceful difficulty if it's not null
+	 *
+	 * @param world to set the difficulty of
+	 */
 	private void setPeaceful(World world) {
 		if (world != null) {
 			world.setDifficulty(Difficulty.PEACEFUL);
 		}
 	}
 
+	/**
+	 * @return the world for players to spawn into in the lobby
+	 */
 	public World getLobbyWorld() {
 		return lobbyWorld;
 	}
 
+	/**
+	 * @return the game map with all parsed locations in it
+	 */
 	public MapImpl getGameMap() {
 		return gameWorld;
 	}
 
+	/**
+	 * @return whether both the lobby world and game map have been loaded successfully
+	 */
 	public boolean isLoaded() {
 		return loaded;
+	}
+
+	/**
+	 * Unloads the temporary game world then deletes it. This allows it to be re-created from the original.
+	 *
+	 * @param plugin which is requesting the temporary world be unloaded
+	 */
+	public void unloadTemporaryWorld(JavaPlugin plugin) {
+		World gameWorld = this.gameWorld.getWorld();
+		if (gameWorld != null) {
+			Bukkit.unloadWorld(gameWorld, false);
+			try {
+				FileUtils.deleteDirectory(gameWorldDirectory);
+				plugin.getLogger().info("Deleted temporary game world successfully!");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

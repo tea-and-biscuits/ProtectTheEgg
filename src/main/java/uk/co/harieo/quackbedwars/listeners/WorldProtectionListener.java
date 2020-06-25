@@ -34,7 +34,8 @@ public class WorldProtectionListener implements Listener {
 	}
 
 	private boolean isOutOfGame() {
-		return ProtectTheEgg.getInstance().getGameStage() != GameStage.IN_GAME;
+		GameStage stage = ProtectTheEgg.getInstance().getGameStage();
+		return stage != GameStage.IN_GAME && stage != GameStage.ERROR;
 	}
 
 }
