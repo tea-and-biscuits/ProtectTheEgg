@@ -1,0 +1,75 @@
+blocks:
+    name: '&a&lBlocks'
+    material: grass_block
+    items:
+        wool:
+            name: '&f&lWool Block'
+            lore:
+                - "&7The cheap man's building block"
+            material: white_wool
+            amount: 16
+            cost:
+                iron: 4
+        wood:
+            name: '&e&lWood Planks'
+            lore:
+                - '&7More durable and less friendly than wool'
+            material: oak_planks
+            amount: 8
+            cost:
+                iron: 4
+        obsidian:
+            name: '&b&lObsidian'
+            lore:
+                - '&7This one protected your egg long ago'
+                - '&7in &bThe End &7times...'
+            material: obsidian
+            amount: 4
+            cost:
+                emerald: 1
+
+weapons:
+    name: '&e&lWeaponry'
+    material: iron_axe
+    items:
+        stone_sword:
+            name: '&7&lStone Sword'
+            lore:
+                - '&7Better than nothing :)'
+            material: stone_sword
+            amount: 1
+            cost:
+                iron: 8
+        iron_sword:
+            name: '&f&lIron Sword'
+            lore:
+                - '&7A reinforced blade for the wealthier duck'
+            material: iron_sword
+            amount: 1
+            cost:
+                gold: 4
+        diamond_sword:
+            name: '&b&lDiamond Sword'
+            lore:
+                - "&7We're not messing around with this one..."
+            material: diamond_sword
+            amount: 1
+            cost:
+                emerald: 2
+        bow:
+            name: '&6&lBow'
+            lore:
+                - "&7The Bridger's Bane"
+                - '&7&oArrows not included'
+            material: bow
+            amount: 1
+            cost:
+                gold: 8
+        arrows:
+            name: '&e&lArrows'
+            lore:
+                - '&7An excellent compliment to the &6&lBow'
+            material: arrow
+            amount: 4
+            cost:
+                gold: 2

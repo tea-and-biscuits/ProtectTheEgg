@@ -1,26 +1,34 @@
 package uk.co.harieo.quackbedwars.shops;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
+import org.bukkit.entity.Villager.Type;
+
+import uk.co.harieo.minigames.menus.MenuFactory;
 
 public enum ShopType {
 
-	ITEMS("Item Shop", "item-shop", Profession.WEAPONSMITH),
-	UPGRADES("Team Upgrades", "upgrade-shop", Profession.CLERIC);
+	ITEMS("Item Shop", "item-shop", ChatColor.GREEN, Profession.WEAPONSMITH),
+	UPGRADES("Team Upgrades", "upgrade-shop", ChatColor.YELLOW, Profession.CLERIC);
 
 	private final String shopName;
 	private final String mapValue;
-	private final Profession villagerProfession;
+	private final ChatColor color;
+	private final Villager.Profession villagerProfession;
+	private ShopMenu menu;
 
 	/**
 	 * Represents a type of shop that players can purchase things from
 	 *
 	 * @param shopName the name of the shop to be displayed in its menu
 	 * @param mapValue the key to be used in a map to represent this shop's location
-	 * @param villagerProfession the profession of the villager NPC which owns this shop
+	 * @param villagerProfession the profession of villager to set the NPC as
 	 */
-	ShopType(String shopName, String mapValue, Profession villagerProfession) {
+	ShopType(String shopName, String mapValue, ChatColor color, Villager.Profession villagerProfession) {
 		this.shopName = shopName;
 		this.mapValue = mapValue;
+		this.color = color;
 		this.villagerProfession = villagerProfession;
 	}
 
@@ -39,10 +47,33 @@ public enum ShopType {
 	}
 
 	/**
+	 * @return the chat color to represent this type
+	 */
+	public ChatColor getColor() {
+		return color;
+	}
+
+	/**
 	 * @return the profession of this villager
 	 */
-	public Profession getVillagerProfession() {
+	public Villager.Profession getVillagerProfession() {
 		return villagerProfession;
+	}
+
+	/**
+	 * @return the menu for this shop
+	 */
+	public ShopMenu getMenu() {
+		return menu;
+	}
+
+	/**
+	 * Sets this shop's menu
+	 *
+	 * @param menu which displays this shop
+	 */
+	public void setMenu(ShopMenu menu) {
+		this.menu = menu;
 	}
 
 	/**

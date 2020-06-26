@@ -38,7 +38,7 @@ public class GameStartStage {
 		mainScoreboard.addLine(new ConstantElement(ChatColor.YELLOW + ChatColor.BOLD.toString() + "Players Left"));
 		mainScoreboard.addLine(new PlayersLeftElement());
 		mainScoreboard.addBlankLine();
-		mainScoreboard.addLine(new ConstantElement(ChatColor.GREEN + ChatColor.BOLD.toString() + "Your Kills"));
+		mainScoreboard.addLine(new ConstantElement(ChatColor.GOLD + ChatColor.BOLD.toString() + "Your Kills"));
 		mainScoreboard.addLine(new StatisticsElement(Statistic.KILLS));
 		mainScoreboard.addBlankLine();
 		mainScoreboard.addLine(ProtectTheEgg.IP_ELEMENT);
@@ -98,10 +98,27 @@ public class GameStartStage {
 
 	private static void releasePlayers(ProtectTheEgg plugin) {
 		plugin.setGameStage(GameStage.IN_GAME);
+		gameTimer.start();
 	}
 
+	/**
+	 * Broadcasts when time is running out at certain intervals
+	 *
+	 * @param tick on the timer
+	 */
 	private static void onTick(int tick) {
-
+		int secondsLeft = gameTimer.getSecondsLeft();
+		if (secondsLeft == 60 * 2) {
+			Bukkit.broadcastMessage(ProtectTheEgg
+					.formatMessage(ChatColor.GRAY + "There are only " + ChatColor.YELLOW + "2 minutes left!"));
+		} else if (secondsLeft == 60) {
+			Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
+					ChatColor.GRAY + "The game is almost over, only " + ChatColor.GOLD + "1 minute left!"));
+		} else if (secondsLeft == 30 || (secondsLeft > 0 && secondsLeft <= 10)) {
+			Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
+					ChatColor.GRAY + "The game will be " + ChatColor.RED + "a draw " + ChatColor.GRAY + "in "
+							+ secondsLeft + " seconds!"));
+		}
 	}
 
 }

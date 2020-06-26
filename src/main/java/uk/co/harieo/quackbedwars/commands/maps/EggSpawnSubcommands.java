@@ -80,7 +80,7 @@ public class EggSpawnSubcommands implements Subcommand {
 
 				Location location = player.getLocation();
 				map.addLocation(location, EggData.EGG_KEY, team.name());
-				TeamGameData.getGameData(team).setEggData(new EggData(location.getBlock())); // Caches the location
+				TeamGameData.getGameData(team).setEggData(new EggData(location.getBlock(), team)); // Caches the location
 
 				player.sendMessage(ProtectTheEgg.formatMessage(
 						ChatColor.GRAY + "Set this to a " + team.getFormattedName() + ChatColor.GRAY

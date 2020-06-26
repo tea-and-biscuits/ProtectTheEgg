@@ -2,7 +2,9 @@ package uk.co.harieo.quackbedwars.currency;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 public class CurrencySpawnRate {
 
@@ -51,10 +53,16 @@ public class CurrencySpawnRate {
 		}
 	}
 
+	/**
+	 * Drops an amount of items equal to {@link #getAmountPerSpawn()} at the specified location
+	 *
+	 * @param location to drop the items at
+	 */
 	public void dropItems(Location location) {
 		World world = location.getWorld();
 		if (world != null) {
-			world.dropItem(location, new ItemStack(getCurrency().getMaterial(), getAmountPerSpawn()));
+			Item item = world.dropItem(location, new ItemStack(getCurrency().getMaterial(), getAmountPerSpawn()));
+			item.setVelocity(new Vector(0, 0, 0)); // Make it drop straight down
 		}
 	}
 

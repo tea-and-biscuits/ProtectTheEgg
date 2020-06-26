@@ -18,7 +18,6 @@ public interface CurrencySpawner {
 		for (CurrencySpawnRate spawnRate : spawnRates) {
 			Currency currency = spawnRate.getCurrency();
 			builder.append(currency.getColor());
-			builder.append(ChatColor.BOLD);
 			builder.append(currency.getName());
 			if (loops + 1 < spawnRates.size()) {
 				builder.append(ChatColor.GRAY);
