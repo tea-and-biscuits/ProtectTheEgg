@@ -1,6 +1,5 @@
 package uk.co.harieo.quackbedwars.egg;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -88,7 +87,6 @@ public class EggData {
 				Block block = pair.getLocation().getBlock();
 
 				EggData eggData = new EggData(block, team);
-				eggData.setBlockMaterial();
 				TeamGameData.getGameData(team).setEggData(eggData);
 				successes++;
 			} catch (IllegalArgumentException ignored) {

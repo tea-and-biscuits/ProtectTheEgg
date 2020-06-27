@@ -67,6 +67,10 @@ public enum BedWarsTeam {
 		return team.getTeamMembers();
 	}
 
+	public List<Player> getOnlineMembers() {
+		return team.getOnlineTeamMembers();
+	}
+
 	public void addMember(Player player) {
 		team.addTeamMember(player);
 	}

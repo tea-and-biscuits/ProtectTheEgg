@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 
 public class BaseCurrencyUpgrade implements CurrencyUpgrade {
 
@@ -28,8 +29,23 @@ public class BaseCurrencyUpgrade implements CurrencyUpgrade {
 	}
 
 	@Override
+	public String getDescription() {
+		return "The base resource upgrade";
+	}
+
+	@Override
 	public int getDiamondCost() {
 		return -1;
+	}
+
+	@Override
+	public boolean isUnlocked(BedWarsTeam team) {
+		return true;
+	}
+
+	@Override
+	public void activateUpgrade(BedWarsTeam team) {
+		throw new UnsupportedOperationException("Base upgrade cannot be activated");
 	}
 
 }

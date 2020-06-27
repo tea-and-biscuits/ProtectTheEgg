@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import uk.co.harieo.minigames.games.GameStage;
 import uk.co.harieo.minigames.timing.LobbyTimer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.stages.GameEndStage;
 import uk.co.harieo.quackbedwars.teams.TeamHandler;
 
 public class ConnectionListener implements Listener {
@@ -43,6 +44,7 @@ public class ConnectionListener implements Listener {
 		player.setGameMode(GameMode.SURVIVAL);
 		player.setFoodLevel(20);
 		player.setHealth(20);
+		player.getInventory().clear();
 
 		GameStage stage = plugin.getGameStage();
 		if (stage == GameStage.LOBBY || stage == GameStage.ERROR) {
@@ -78,8 +80,11 @@ public class ConnectionListener implements Listener {
 		GameStage stage = plugin.getGameStage();
 		if (stage == GameStage.LOBBY) {
 			updateTimer(plugin, playerCount);
-		} else if (stage != GameStage.ERROR) { // If there is an error, the server may need to be up for repairs
+		} else if (stage != GameStage.ERROR
+				&& playerCount < 2) { // If there is an error, the server may need to be up for repairs
 			Bukkit.getServer().shutdown();
+		} else if (stage == GameStage.IN_GAME) {
+			GameEndStage.checkForWinningTeam();
 		}
 	}
 

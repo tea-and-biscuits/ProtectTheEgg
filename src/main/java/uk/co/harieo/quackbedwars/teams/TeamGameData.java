@@ -55,7 +55,11 @@ public class TeamGameData {
 	}
 
 	public static TeamGameData getGameData(BedWarsTeam team) {
-		return data.getOrDefault(team, new TeamGameData(team));
+		if (data.containsKey(team)) {
+			return data.get(team);
+		} else {
+			return new TeamGameData(team);
+		}
 	}
 
 }

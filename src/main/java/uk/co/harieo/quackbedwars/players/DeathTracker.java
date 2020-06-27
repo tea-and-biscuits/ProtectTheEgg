@@ -11,10 +11,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import net.md_5.bungee.api.ChatColor;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.stages.GameEndStage;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 import uk.co.harieo.quackbedwars.teams.TeamHandler;
@@ -76,6 +79,7 @@ public class DeathTracker implements Listener {
 						victim.sendMessage(ProtectTheEgg.formatMessage(
 								ChatColor.RED + "You have died without an egg! " + ChatColor.GRAY
 										+ "We've put you into " + ChatColor.YELLOW + "Spectator Mode."));
+						GameEndStage.checkForWinningTeam();
 					}
 
 					victim.playSound(victim.getLocation(), Sound.ENTITY_GHAST_SCREAM, 0.5F, 0.5F);
@@ -158,10 +162,13 @@ public class DeathTracker implements Listener {
 	}
 
 	/**
-	 * @return a set of all living players
+	 * @return a set of all living (and online) players
 	 */
-	public static Set<UUID> getLivingPlayers() {
-		return livingPlayers;
+	public static Set<Player> getLivingPlayers() {
+		return livingPlayers.stream()
+				.map(Bukkit::getPlayer)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toSet());
 	}
 
 }

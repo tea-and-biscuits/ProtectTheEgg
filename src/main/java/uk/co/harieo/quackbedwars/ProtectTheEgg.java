@@ -22,8 +22,12 @@ import uk.co.harieo.quackbedwars.listeners.WorldProtectionListener;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.scoreboard.PlayerCountElement;
 import uk.co.harieo.quackbedwars.scoreboard.TeamNameElement;
+import uk.co.harieo.quackbedwars.shops.ShopMenu;
 import uk.co.harieo.quackbedwars.shops.ShopNPCListener;
+import uk.co.harieo.quackbedwars.shops.ShopType;
+import uk.co.harieo.quackbedwars.shops.config.ShopItem;
 import uk.co.harieo.quackbedwars.stages.GameStartStage;
+import uk.co.harieo.quackbedwars.teams.upgrades.PurchasableCurrencyUpgrade;
 
 public class ProtectTheEgg extends Minigame {
 
@@ -64,6 +68,10 @@ public class ProtectTheEgg extends Minigame {
 		}
 		lobbyTimer.setPrefix(PREFIX);
 		lobbyTimer.setOnTimerEnd(end -> GameStartStage.startGame());
+
+		ShopMenu upgradesMenu = new ShopMenu(ShopType.UPGRADES, 1);
+		ShopType.UPGRADES.setMenu(upgradesMenu);
+		upgradesMenu.setStaticItem(0, PurchasableCurrencyUpgrade.CATEGORY);
 
 		setupScoreboard();
 		registerListeners(new ConnectionListener(), new WorldProtectionListener(), new EggListener(),

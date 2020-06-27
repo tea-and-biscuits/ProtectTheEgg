@@ -15,12 +15,14 @@ import uk.co.harieo.minigames.timing.GameTimer;
 import uk.co.harieo.minigames.timing.Timer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnHandler;
+import uk.co.harieo.quackbedwars.egg.EggData;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.PlayerEffects;
 import uk.co.harieo.quackbedwars.players.Statistic;
 import uk.co.harieo.quackbedwars.scoreboard.PlayersLeftElement;
 import uk.co.harieo.quackbedwars.scoreboard.StatisticsElement;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.TeamGameData;
 import uk.co.harieo.quackbedwars.teams.TeamHandler;
 import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
 
@@ -28,7 +30,7 @@ public class GameStartStage {
 
 	private static final GameBoard mainScoreboard = new GameBoard(
 			ChatColor.GOLD + ChatColor.BOLD.toString() + "Protect the Egg", DisplaySlot.SIDEBAR);
-	private static final GameTimer gameTimer = new GameTimer(ProtectTheEgg.getInstance(), 20 * 60 * 20);
+	private static final GameTimer gameTimer = new GameTimer(ProtectTheEgg.getInstance(), 60 * 20);
 
 	static {
 		mainScoreboard.addBlankLine();
@@ -45,7 +47,7 @@ public class GameStartStage {
 
 		gameTimer.setPrefix(ProtectTheEgg.PREFIX);
 		gameTimer.setOnTimerTick(GameStartStage::onTick);
-		// TODO onEnd
+		gameTimer.setOnTimerEnd(end -> GameEndStage.forceDraw());
 	}
 
 	public static void startGame() {
@@ -76,9 +78,15 @@ public class GameStartStage {
 				}
 			}
 
+			EggData eggData = TeamGameData.getGameData(team).getEggData();
+			if (eggData != null) {
+				eggData.setBlockMaterial();
+			}
+
 			player.teleport(Objects.requireNonNull(TeamSpawnHandler.getSpawn(team),
 					"No spawn available for " + team.getName() + " team"));
 			DeathTracker.markAlive(player);
+			mainScoreboard.render(plugin, player, 20);
 		}
 
 		int seconds = 5;

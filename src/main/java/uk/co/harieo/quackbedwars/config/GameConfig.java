@@ -17,14 +17,13 @@ public class GameConfig {
 	private int maxTeams = 12;
 	private List<String> timerMessages;
 	private GameWorldConfig gameWorldConfig;
-	private ItemsConfig itemsConfig;
 
 	public GameConfig(JavaPlugin plugin) {
 		try {
 			FileConfiguration configuration = getConfiguration(plugin, "config.yml");
 			loadFields(configuration);
 			gameWorldConfig = new GameWorldConfig(plugin, configuration);
-			itemsConfig = new ItemsConfig(plugin);
+			new ItemsConfig(plugin);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

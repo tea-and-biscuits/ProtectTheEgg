@@ -1,12 +1,17 @@
 package uk.co.harieo.quackbedwars.teams.upgrades;
 
-import com.google.common.collect.Sets;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.*;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
+import uk.co.harieo.quackbedwars.shops.ShopType;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.TeamGameData;
+import uk.co.harieo.quackbedwars.teams.menu.UpgradeCategory;
 
 public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 
@@ -19,10 +24,34 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 			new CurrencySpawnRate(Currency.GOLD, 3, 2)),
 	RESOURCES_FOUR("Resources IV", 8, RESOURCES_THREE, new CurrencySpawnRate(Currency.EMERALD, 3, 2));
 
+	public static UpgradeCategory CATEGORY;
+
+	static {
+		// Set the children here to avoid backwards referencing
+		for (PurchasableCurrencyUpgrade upgrade : values()) {
+			PurchasableCurrencyUpgrade parent = upgrade.getParent();
+			if (parent != null) {
+				parent.setChild(upgrade);
+			}
+		}
+
+		ItemStack categoryItem = new ItemStack(Material.DIAMOND);
+		ItemMeta meta = categoryItem.getItemMeta();
+		if (meta != null) {
+			meta.setDisplayName(ChatColor.AQUA + ChatColor.BOLD.toString() + "Currency Upgrades");
+			meta.setLore(Collections.singletonList(ChatColor.GRAY + "Upgrade your Resource Spawner"));
+			categoryItem.setItemMeta(meta);
+		}
+
+		CATEGORY = new UpgradeCategory(categoryItem, Arrays.asList(values()));
+	}
+
 	private final String name;
+	private String description;
 	private final int diamondCost;
-	private final PurchasableCurrencyUpgrade parent;
 	private final Map<Currency, CurrencySpawnRate> spawnRates = new HashMap<>(); // Key prevents duplicate spawn rates
+	private final PurchasableCurrencyUpgrade parent;
+	private PurchasableCurrencyUpgrade child;
 
 	PurchasableCurrencyUpgrade(String name, int diamondCost, PurchasableCurrencyUpgrade parent, CurrencySpawnRate... newSpawnRates) {
 		this.name = name;
@@ -34,8 +63,11 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 			this.spawnRates.put(spawnRate.getCurrency(), spawnRate);
 		}
 
+		// Form a description based on what currencies are being upgraded (excluding parent upgrades)
+		setDescription();
+
 		if (parent != null) {
-			this.spawnRates.putAll(parent.getChangedSpawnRates()); // And all the ones before it (from the parent)
+			this.spawnRates.putAll(parent.getChangedSpawnRates()); // Add all the upgrades from parents
 		}
 	}
 
@@ -49,8 +81,37 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 	}
 
 	@Override
+	public String getDescription() {
+		return description;
+	}
+
+	@Override
 	public int getDiamondCost() {
 		return diamondCost;
+	}
+
+	@Override
+	public boolean isUnlocked(BedWarsTeam team) {
+		TeamGameData gameData = TeamGameData.getGameData(team);
+		CurrencyUpgrade currentUpgrade = gameData.getCurrencyUpgrade();
+		if (currentUpgrade == this) {
+			return true;
+		} else {
+			PurchasableCurrencyUpgrade child = getChild();
+			while (child != null) {
+				if (child == currentUpgrade) {
+					return true;
+				}
+				child = child.getChild();
+			}
+
+			return false;
+		}
+	}
+
+	@Override
+	public void activateUpgrade(BedWarsTeam team) {
+		TeamGameData.getGameData(team).setCurrencyUpgrade(this);
 	}
 
 	@Override
@@ -60,6 +121,39 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 
 	public PurchasableCurrencyUpgrade getParent() {
 		return parent;
+	}
+
+	public PurchasableCurrencyUpgrade getChild() {
+		return child;
+	}
+
+	private void setChild(PurchasableCurrencyUpgrade child) {
+		this.child = child;
+	}
+
+	private void setDescription() {
+		StringBuilder descriptionBuilder = new StringBuilder();
+		descriptionBuilder.append(ChatColor.GRAY);
+		descriptionBuilder.append("Increases your ");
+
+		Set<Currency> upgradedCurrencies = spawnRates.keySet();
+		int upgradesSize = upgradedCurrencies.size();
+		int iterations = 0;
+
+		for (Currency currency : upgradedCurrencies) {
+			descriptionBuilder.append(currency.getColor());
+			descriptionBuilder.append(currency.getName());
+			if (iterations + 2 < upgradesSize) {
+				descriptionBuilder.append(ChatColor.GRAY);
+				descriptionBuilder.append(", ");
+			} else if (iterations + 1 < upgradesSize) {
+				descriptionBuilder.append(ChatColor.GRAY);
+				descriptionBuilder.append(" and ");
+			}
+
+			iterations++;
+		}
+		this.description = descriptionBuilder.toString();
 	}
 
 }
