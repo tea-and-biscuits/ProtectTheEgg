@@ -1,39 +1,62 @@
 package uk.co.harieo.quackbedwars.teams.menu;
 
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import uk.co.harieo.minigames.menus.MenuItem;
+import uk.co.harieo.quackbedwars.shops.ShopMenu;
+import uk.co.harieo.quackbedwars.shops.ShopType;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.TeamHandler;
 import uk.co.harieo.quackbedwars.teams.upgrades.TeamUpgrade;
 
 public class UpgradeCategory extends MenuItem {
 
 	private final List<TeamUpgrade> upgrades;
-	private final Map<BedWarsTeam, List<UpgradeItem>> upgradeItemMap = new HashMap<>(); // Caches menu items per team
+	private final Map<BedWarsTeam, ShopMenu> subMenuMap = new HashMap<>(); // Caches menu items per team
 
+	/**
+	 * A category of {@link TeamUpgrade} which a team can purchase
+	 *
+	 * @param displayItem to represent this category
+	 * @param upgrades in this category
+	 */
 	public UpgradeCategory(ItemStack displayItem, List<TeamUpgrade> upgrades) {
 		super(displayItem);
 		this.upgrades = upgrades;
+		setOnClick(this::showSubMenu);
 	}
 
-	public List<UpgradeItem> getUpgradeItems(BedWarsTeam team) {
-		List<UpgradeItem> items;
-		if (upgradeItemMap.containsKey(team)) {
-			items = upgradeItemMap.get(team);
-			items.forEach(UpgradeItem::update);
-		} else {
-			items = new ArrayList<>();
-			for (TeamUpgrade upgrade : upgrades) {
-				items.add(new UpgradeItem(team, upgrade));
+	/**
+	 * Retrieves the {@link ShopMenu} for the specified player's {@link BedWarsTeam}, or creates it if not cached, then
+	 * updates all the instances of {@link UpgradeItem} to display up-to-date information. The menu is then shown to
+	 * the player.
+	 *
+	 * @param player to show the menu to
+	 */
+	public void showSubMenu(Player player) {
+		BedWarsTeam team = TeamHandler.getTeam(player);
+		if (team != null) {
+			ShopMenu teamMenu = subMenuMap.get(team);
+			if (teamMenu == null) {
+				teamMenu = new ShopMenu(ShopType.UPGRADES, upgrades.size() / 9 + 1);
+				for (int i = 0; i < upgrades.size(); i++) { // Add the base items to the new menu
+					teamMenu.setStaticItem(i, new UpgradeItem(team, upgrades.get(i)));
+				}
+				subMenuMap.put(team, teamMenu);
 			}
-			upgradeItemMap.put(team, items);
-		}
 
-		return items;
+			for (MenuItem menuItem : teamMenu.getStaticItems()) {
+				if (menuItem instanceof UpgradeItem) {
+					((UpgradeItem) menuItem).update(); // Refreshes the data on the item
+				}
+			}
+
+			teamMenu.getOrCreateMenu(player).showInventory();
+		}
 	}
 
 }

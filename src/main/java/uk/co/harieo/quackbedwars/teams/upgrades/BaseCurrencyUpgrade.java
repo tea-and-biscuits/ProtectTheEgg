@@ -44,6 +44,11 @@ public class BaseCurrencyUpgrade implements CurrencyUpgrade {
 	}
 
 	@Override
+	public boolean canUnlock(BedWarsTeam team) {
+		return false;
+	}
+
+	@Override
 	public void activateUpgrade(BedWarsTeam team) {
 		throw new UnsupportedOperationException("Base upgrade cannot be activated");
 	}

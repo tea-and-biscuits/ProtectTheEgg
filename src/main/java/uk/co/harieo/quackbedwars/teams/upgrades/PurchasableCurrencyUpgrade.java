@@ -8,7 +8,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
-import uk.co.harieo.quackbedwars.shops.ShopType;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 import uk.co.harieo.quackbedwars.teams.menu.UpgradeCategory;
@@ -110,6 +109,16 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 	}
 
 	@Override
+	public boolean canUnlock(BedWarsTeam team) {
+		PurchasableCurrencyUpgrade parent = getParent();
+		if (parent != null) {
+			return parent.isUnlocked(team); // If the upgrade before this is unlocked, this one is available
+		} else {
+			return !isUnlocked(team); // This is likely the first available upgrade
+		}
+	}
+
+	@Override
 	public void activateUpgrade(BedWarsTeam team) {
 		TeamGameData.getGameData(team).setCurrencyUpgrade(this);
 	}
@@ -153,6 +162,9 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 
 			iterations++;
 		}
+
+		descriptionBuilder.append(ChatColor.GRAY);
+		descriptionBuilder.append(" Production");
 		this.description = descriptionBuilder.toString();
 	}
 

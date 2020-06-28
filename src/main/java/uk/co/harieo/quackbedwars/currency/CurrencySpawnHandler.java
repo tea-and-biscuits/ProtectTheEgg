@@ -112,6 +112,8 @@ public class CurrencySpawnHandler {
 			spawningTask = Bukkit.getScheduler().runTaskTimer(ProtectTheEgg.getInstance(), () -> {
 				for (Entry<Location, CurrencySpawner> spawners : spawnerLocations.entrySet()) {
 					CurrencySpawner spawner = spawners.getValue();
+					spawner.formatHologram();
+
 					for (CurrencySpawnRate spawnRate : spawner.getSpawnRates()) {
 						if (spawnRate.getInternalSecond() == spawnRate.getSecondsPerSpawn()) {
 							spawnRate.dropItems(spawners.getKey());

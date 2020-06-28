@@ -10,7 +10,7 @@ public class CurrencyHandler {
 		return player.getInventory().contains(currency.getMaterial(), amount);
 	}
 
-	public static boolean subtractCurrency(Player player, Currency currency, int amountToSubtract) {
+	public static void subtractCurrency(Player player, Currency currency, int amountToSubtract) {
 		if (hasAmountOfCurrency(player, currency, amountToSubtract)) {
 			PlayerInventory inventory = player.getInventory();
 
@@ -33,9 +33,6 @@ public class CurrencyHandler {
 				}
 			}
 
-			return true;
-		} else {
-			return false;
 		}
 	}
 
