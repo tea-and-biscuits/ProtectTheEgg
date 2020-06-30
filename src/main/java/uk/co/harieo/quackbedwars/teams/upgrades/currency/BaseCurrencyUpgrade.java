@@ -1,4 +1,4 @@
-package uk.co.harieo.quackbedwars.teams.upgrades;
+package uk.co.harieo.quackbedwars.teams.upgrades.currency;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package uk.co.harieo.quackbedwars.teams.upgrades;
+package uk.co.harieo.quackbedwars.teams.upgrades.currency;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,7 +23,7 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 			new CurrencySpawnRate(Currency.GOLD, 3, 2)),
 	RESOURCES_FOUR("Resources IV", 8, RESOURCES_THREE, new CurrencySpawnRate(Currency.EMERALD, 3, 2));
 
-	public static UpgradeCategory CATEGORY;
+	private static final UpgradeCategory category;
 
 	static {
 		// Set the children here to avoid backwards referencing
@@ -42,7 +42,7 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 			categoryItem.setItemMeta(meta);
 		}
 
-		CATEGORY = new UpgradeCategory(categoryItem, Arrays.asList(values()));
+		category = new UpgradeCategory(categoryItem, Arrays.asList(values()));
 	}
 
 	private final String name;
@@ -166,6 +166,10 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 		descriptionBuilder.append(ChatColor.GRAY);
 		descriptionBuilder.append(" Production");
 		this.description = descriptionBuilder.toString();
+	}
+
+	public static UpgradeCategory getCategory() {
+		return category;
 	}
 
 }

@@ -1,15 +1,35 @@
-package uk.co.harieo.quackbedwars.currency;
+package uk.co.harieo.quackbedwars.currency.handlers;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import uk.co.harieo.quackbedwars.currency.Currency;
+
+/**
+ * A handler for checking the amount of {@link Currency} a player has and subtracting from it for purchases
+ */
 public class CurrencyHandler {
 
+	/**
+	 * Checks whether a player has the specified amount of currency in their inventory
+	 *
+	 * @param player to check the inventory of
+	 * @param currency to check if they have it
+	 * @param amount of currency to check for
+	 * @return whether the specified player has the specified amount of currency
+	 */
 	public static boolean hasAmountOfCurrency(Player player, Currency currency, int amount) {
 		return player.getInventory().contains(currency.getMaterial(), amount);
 	}
 
+	/**
+	 * Subtracts an amount of currency from a player
+	 *
+	 * @param player to subtract currency from
+	 * @param currency to be subtracted
+	 * @param amountToSubtract to be subtracted
+	 */
 	public static void subtractCurrency(Player player, Currency currency, int amountToSubtract) {
 		if (hasAmountOfCurrency(player, currency, amountToSubtract)) {
 			PlayerInventory inventory = player.getInventory();

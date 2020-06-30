@@ -18,7 +18,9 @@ public class TeamHandler {
 	public static BedWarsTeam assignTeam(Player player) {
 		int maxPlayers = ProtectTheEgg.getInstance().getGameConfig().getPlayersPerTeam();
 		for (BedWarsTeam team : BedWarsTeam.values()) {
-			if (team.getMembers().size() < maxPlayers && team.isTeamActive()) {
+			if (team.getMembers().size() < maxPlayers
+					&& team.isTeamActive()
+					&& TeamSpawnHandler.getSpawnLocations(team).size() > 0) {
 				setTeam(player, team);
 				return team;
 			}

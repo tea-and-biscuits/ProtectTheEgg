@@ -1,11 +1,8 @@
-package uk.co.harieo.quackbedwars.currency;
+package uk.co.harieo.quackbedwars.currency.handlers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
@@ -15,6 +12,8 @@ import java.util.logging.Logger;
 import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.currency.Currency;
+import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
 import uk.co.harieo.quackbedwars.currency.spawners.CurrencySpawner;
 import uk.co.harieo.quackbedwars.currency.spawners.SingleCurrencySpawner;
 import uk.co.harieo.quackbedwars.currency.spawners.TeamSpawner;
@@ -28,6 +27,11 @@ public class CurrencySpawnHandler {
 	private static final Map<Location, CurrencySpawner> spawnerLocations = new HashMap<>();
 	private static BukkitTask spawningTask;
 
+	/**
+	 * Parses the locations of any known types of {@link CurrencySpawner} then caches them
+	 *
+	 * @param map to be parsed
+	 */
 	public static void parseSpawnerLocations(MapImpl map) {
 		Logger logger = ProtectTheEgg.getInstance().getLogger();
 
@@ -37,6 +41,12 @@ public class CurrencySpawnHandler {
 		logger.info("Parsed " + successfulParses + " resource spawner locations");
 	}
 
+	/**
+	 * Parses the locations of any {@link TeamSpawner} instances in the map
+	 *
+	 * @param map to be parsed
+	 * @return the amount of spawner locations found
+	 */
 	public static int parseTeamSpawnerLocations(MapImpl map) {
 		Logger logger = ProtectTheEgg.getInstance().getLogger();
 
@@ -55,6 +65,12 @@ public class CurrencySpawnHandler {
 		return successes;
 	}
 
+	/**
+	 * Parses the locations of any {@link SingleCurrencySpawner} instances in the map
+	 *
+	 * @param map to be parsed
+	 * @return the amount of spawner locations found
+	 */
 	public static int parseCurrencySpawnerLocations(MapImpl map) {
 		Logger logger = ProtectTheEgg.getInstance().getLogger();
 
@@ -73,6 +89,12 @@ public class CurrencySpawnHandler {
 		return successes;
 	}
 
+	/**
+	 * Adds a spawner to the cache at the specified location, which is centralized to ensure all spawners look the same
+	 *
+	 * @param location to add the spawner to
+	 * @param spawnerInfo which holds the data for this spawner
+	 */
 	public static void addSpawner(Location location, CurrencySpawner spawnerInfo) {
 		Location clonedLocation = location.clone();
 		// Center the location and raise it 1 off the floor for precision
@@ -82,10 +104,9 @@ public class CurrencySpawnHandler {
 		spawnerLocations.put(clonedLocation, spawnerInfo);
 	}
 
-	public static void removeSpawner(Location location) {
-		spawnerLocations.remove(location);
-	}
-
+	/**
+	 * @return a map of the locations of spawners alongside their data
+	 */
 	public static Map<Location, CurrencySpawner> getSpawnerLocations() {
 		return spawnerLocations;
 	}

@@ -1,6 +1,5 @@
 package uk.co.harieo.quackbedwars;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -25,9 +24,10 @@ import uk.co.harieo.quackbedwars.scoreboard.TeamNameElement;
 import uk.co.harieo.quackbedwars.shops.ShopMenu;
 import uk.co.harieo.quackbedwars.shops.ShopNPCListener;
 import uk.co.harieo.quackbedwars.shops.ShopType;
-import uk.co.harieo.quackbedwars.shops.config.ShopItem;
 import uk.co.harieo.quackbedwars.stages.GameStartStage;
-import uk.co.harieo.quackbedwars.teams.upgrades.PurchasableCurrencyUpgrade;
+import uk.co.harieo.quackbedwars.teams.upgrades.currency.PurchasableCurrencyUpgrade;
+import uk.co.harieo.quackbedwars.teams.upgrades.traps.PurchasableTraps;
+import uk.co.harieo.quackbedwars.teams.upgrades.traps.TrapListener;
 
 public class ProtectTheEgg extends Minigame {
 
@@ -71,11 +71,12 @@ public class ProtectTheEgg extends Minigame {
 
 		ShopMenu upgradesMenu = new ShopMenu(ShopType.UPGRADES, 1);
 		ShopType.UPGRADES.setMenu(upgradesMenu);
-		upgradesMenu.setStaticItem(0, PurchasableCurrencyUpgrade.CATEGORY);
+		upgradesMenu.setStaticItem(0, PurchasableCurrencyUpgrade.getCategory());
+		upgradesMenu.setStaticItem(1, PurchasableTraps.getCategory());
 
 		setupScoreboard();
 		registerListeners(new ConnectionListener(), new WorldProtectionListener(), new EggListener(),
-				new DeathTracker(), new ShopNPCListener());
+				new DeathTracker(), new ShopNPCListener(), new TrapListener());
 		registerCommand(new MapCommand(), "map", "maps");
 		registerCommand(new ForceStartCommand(), "force", "forcestart");
 		setGameStage(isDevelopmentMode ? GameStage.ERROR : GameStage.LOBBY);

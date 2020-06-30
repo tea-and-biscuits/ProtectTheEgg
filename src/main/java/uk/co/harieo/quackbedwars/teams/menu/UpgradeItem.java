@@ -11,7 +11,7 @@ import java.util.Set;
 import uk.co.harieo.minigames.menus.MenuItem;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.Currency;
-import uk.co.harieo.quackbedwars.currency.CurrencyHandler;
+import uk.co.harieo.quackbedwars.currency.handlers.CurrencyHandler;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamHandler;
 import uk.co.harieo.quackbedwars.teams.upgrades.TeamUpgrade;

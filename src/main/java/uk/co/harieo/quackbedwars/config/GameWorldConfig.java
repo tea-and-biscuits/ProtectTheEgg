@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
-import uk.co.harieo.quackbedwars.currency.CurrencySpawnHandler;
+import uk.co.harieo.quackbedwars.currency.handlers.CurrencySpawnHandler;
 import uk.co.harieo.quackbedwars.egg.EggData;
 import uk.co.harieo.quackbedwars.shops.ShopHandler;
 import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;

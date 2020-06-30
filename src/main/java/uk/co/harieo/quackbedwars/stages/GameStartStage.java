@@ -14,7 +14,7 @@ import uk.co.harieo.minigames.scoreboards.elements.ConstantElement;
 import uk.co.harieo.minigames.timing.GameTimer;
 import uk.co.harieo.minigames.timing.Timer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
-import uk.co.harieo.quackbedwars.currency.CurrencySpawnHandler;
+import uk.co.harieo.quackbedwars.currency.handlers.CurrencySpawnHandler;
 import uk.co.harieo.quackbedwars.egg.EggData;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.PlayerEffects;

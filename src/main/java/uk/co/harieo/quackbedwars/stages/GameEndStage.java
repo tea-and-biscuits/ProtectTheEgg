@@ -101,7 +101,7 @@ public class GameEndStage {
 			int kills = Statistic.KILLS.getValue(mostKillsPlayer);
 			Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
 					ChatColor.GRAY + "With " + ChatColor.YELLOW + kills + " Kills"
-							+ ChatColor.GRAY + ", the " + ChatColor.GREEN + "MVP " + ChatColor.GRAY + " is "
+							+ ChatColor.GRAY + ", the " + ChatColor.GREEN + "MVP" + ChatColor.GRAY + " is "
 							+ ChatColor.GOLD + mostKillsPlayer.getName()));
 		} else {
 			Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(ChatColor.GRAY + "To the victors, the spoils!"));

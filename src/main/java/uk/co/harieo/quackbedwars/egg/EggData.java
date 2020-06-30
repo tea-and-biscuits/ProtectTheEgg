@@ -107,4 +107,11 @@ public class EggData {
 		return eggDataCache.get(block);
 	}
 
+	/**
+	 * @return a map of all cached eggs and their data
+	 */
+	public static Map<Block, EggData> getCachedEggs() {
+		return eggDataCache;
+	}
+
 }

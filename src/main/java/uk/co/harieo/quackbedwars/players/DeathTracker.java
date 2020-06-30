@@ -5,10 +5,14 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -29,20 +33,54 @@ public class DeathTracker implements Listener {
 	private static final Set<UUID> spectators = new HashSet<>();
 
 	@EventHandler
+	public void onEntityDamage(EntityDamageEvent event) {
+		Entity entityVictim = event.getEntity();
+		if (entityVictim instanceof Player) {
+			Player victim = (Player) entityVictim;
+			if (!spectators.contains(victim.getUniqueId()) && willKill(event, victim)) {
+				event.setCancelled(true);
+
+				// Broadcast death message (entity attack is dealt with by EntityDamageByEntityEvent handler)
+				if (event.getCause() != DamageCause.ENTITY_ATTACK) {
+					Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
+							ChatColor.RED + victim.getName() + ChatColor.GRAY + " has fallen in battle!"));
+				}
+
+				// Respawn the player and update their statistics
+				BedWarsTeam victimTeam = TeamHandler.getTeam(victim);
+				if (victimTeam != null) {
+					Location location = TeamSpawnHandler.getSpawn(victimTeam);
+					if (location != null) {
+						victim.teleport(location);
+					}
+
+					Statistic.DEATHS.addValue(victim, 1);
+					TeamGameData gameData = TeamGameData.getGameData(victimTeam);
+
+					if (gameData.isEggIntact()) {
+						delayedRespawn(victim, location);
+					} else {
+						setSpectator(victim);
+						victim.sendMessage(ProtectTheEgg.formatMessage(
+								ChatColor.RED + "You have died without an egg! " + ChatColor.GRAY
+										+ "We've put you into " + ChatColor.YELLOW + "Spectator Mode."));
+						gameData.decrementPlayersAlive(); // This player is dead forever
+						GameEndStage.checkForWinningTeam();
+					}
+
+					victim.playSound(victim.getLocation(), Sound.ENTITY_GHAST_SCREAM, 0.5F, 0.5F);
+				}
+			}
+		}
+	}
+
+	@EventHandler
 	public void onEntityDamageEntity(EntityDamageByEntityEvent event) {
 		Entity entityVictim = event.getEntity();
 		Entity entityDamager = event.getDamager();
 		if (entityVictim instanceof Player) {
-			Player victim = (Player) event.getEntity();
-			if (spectators.contains(victim.getUniqueId())) {
-				event.setCancelled(true);
-				return;
-			}
-
-			if (event.getFinalDamage() >= victim.getHealth()) { // If they're going to die
-				event.setCancelled(true); // We will imitate death to prevent respawn locking
-
-				String deathMessage;
+			Player victim = (Player) entityVictim;
+			if (willKill(event, victim)) { // If they're going to die
 				if (entityDamager instanceof Player) {
 					Player damager = (Player) entityDamager;
 					Statistic.KILLS.addValue(damager, 1);
@@ -55,37 +93,26 @@ public class DeathTracker implements Listener {
 						color = ChatColor.YELLOW;
 					}
 
-					deathMessage = color + damager.getName() + ChatColor.GRAY + " has slain " + ChatColor.RED + victim
-							.getName();
 					damager.playSound(damager.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5F, 0.5F);
-				} else {
-					deathMessage = ChatColor.RED + victim.getName() + ChatColor.GRAY + " has fallen in battle!";
-				}
-
-				Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(deathMessage));
-
-				BedWarsTeam victimTeam = TeamHandler.getTeam(victim);
-				if (victimTeam != null) {
-					Location location = TeamSpawnHandler.getSpawn(victimTeam);
-					if (location != null) {
-						victim.teleport(location);
-					}
-
-					Statistic.DEATHS.addValue(victim, 1);
-					if (TeamGameData.getGameData(victimTeam).isEggIntact()) {
-						delayedRespawn(victim, location);
-					} else {
-						setSpectator(victim);
-						victim.sendMessage(ProtectTheEgg.formatMessage(
-								ChatColor.RED + "You have died without an egg! " + ChatColor.GRAY
-										+ "We've put you into " + ChatColor.YELLOW + "Spectator Mode."));
-						GameEndStage.checkForWinningTeam();
-					}
-
-					victim.playSound(victim.getLocation(), Sound.ENTITY_GHAST_SCREAM, 0.5F, 0.5F);
+					Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
+							color + damager.getName() + ChatColor.GRAY + " has slain " + ChatColor.RED + victim
+									.getName()));
 				}
 			}
 		}
+	}
+
+	@EventHandler
+	public void onPlayerDeath(PlayerDeathEvent event) {
+		Player player = event.getEntity();
+		BedWarsTeam team = TeamHandler.getTeam(player);
+		if (team != null) {
+			player.teleport(Objects.requireNonNull(TeamSpawnHandler.getSpawn(team)));
+		}
+	}
+
+	private boolean willKill(EntityDamageEvent event, LivingEntity victim) {
+		return event.getFinalDamage() >= victim.getHealth();
 	}
 
 	/**

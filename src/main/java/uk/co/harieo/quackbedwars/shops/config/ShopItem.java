@@ -10,12 +10,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
-import javax.swing.plaf.IconUIResource;
 import uk.co.harieo.minigames.menus.MenuItem;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencyCost;
-import uk.co.harieo.quackbedwars.currency.CurrencyHandler;
+import uk.co.harieo.quackbedwars.currency.handlers.CurrencyHandler;
 
 public class ShopItem extends MenuItem {
 

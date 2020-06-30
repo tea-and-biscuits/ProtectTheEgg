@@ -13,7 +13,7 @@ import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.Currency;
-import uk.co.harieo.quackbedwars.currency.CurrencySpawnHandler;
+import uk.co.harieo.quackbedwars.currency.handlers.CurrencySpawnHandler;
 import uk.co.harieo.quackbedwars.currency.spawners.SingleCurrencySpawner;
 import uk.co.harieo.quackbedwars.currency.spawners.TeamSpawner;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
