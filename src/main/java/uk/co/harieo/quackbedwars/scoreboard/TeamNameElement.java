@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import net.md_5.bungee.api.ChatColor;
 import uk.co.harieo.minigames.scoreboards.elements.RenderableElement;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
-import uk.co.harieo.quackbedwars.teams.TeamHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
 
 public class TeamNameElement implements RenderableElement {
 

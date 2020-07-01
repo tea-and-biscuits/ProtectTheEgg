@@ -1,4 +1,4 @@
-package uk.co.harieo.quackbedwars.teams;
+package uk.co.harieo.quackbedwars.teams.handlers;
 
 import org.bukkit.entity.Player;
 
@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.TeamGameData;
 
 public class TeamHandler {
 

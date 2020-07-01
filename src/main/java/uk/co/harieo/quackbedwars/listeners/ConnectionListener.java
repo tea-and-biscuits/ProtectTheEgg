@@ -15,7 +15,8 @@ import uk.co.harieo.minigames.games.GameStage;
 import uk.co.harieo.minigames.timing.LobbyTimer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.stages.GameEndStage;
-import uk.co.harieo.quackbedwars.teams.TeamHandler;
+import uk.co.harieo.quackbedwars.stages.GameStartStage;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
 
 public class ConnectionListener implements Listener {
 
@@ -58,7 +59,7 @@ public class ConnectionListener implements Listener {
 		} else {
 			event.setJoinMessage(null);
 			player.setGameMode(GameMode.SPECTATOR);
-			// TODO set game scoreboard
+			GameStartStage.showScoreboard(player);
 
 			player.sendMessage(
 					ProtectTheEgg

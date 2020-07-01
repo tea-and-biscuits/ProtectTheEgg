@@ -12,7 +12,7 @@ import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.handlers.CurrencySpawnHandler;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
-import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
 public class MapInfoSubcommand implements Subcommand {
 

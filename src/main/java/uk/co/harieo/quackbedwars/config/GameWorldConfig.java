@@ -18,7 +18,7 @@ import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.handlers.CurrencySpawnHandler;
 import uk.co.harieo.quackbedwars.egg.EggData;
 import uk.co.harieo.quackbedwars.shops.ShopHandler;
-import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
 public class GameWorldConfig {
 
@@ -60,10 +60,7 @@ public class GameWorldConfig {
 
 			try {
 				gameWorld = MapImpl.parseWorld(world);
-				TeamSpawnHandler.parseSpawnLocations(gameWorld);
-				CurrencySpawnHandler.parseSpawnerLocations(gameWorld);
-				EggData.parseEggLocations(gameWorld);
-				ShopHandler.parseShopSpawns(gameWorld);
+				parseMap(gameWorld);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return;
@@ -171,6 +168,18 @@ public class GameWorldConfig {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Parses all locations necessary for this game from the specified map
+	 *
+	 * @param map to parse locations from
+	 */
+	public static void parseMap(MapImpl map) {
+		TeamSpawnHandler.parseSpawnLocations(map);
+		CurrencySpawnHandler.parseSpawnerLocations(map);
+		EggData.parseEggLocations(map);
+		ShopHandler.parseShopSpawns(map);
 	}
 
 }

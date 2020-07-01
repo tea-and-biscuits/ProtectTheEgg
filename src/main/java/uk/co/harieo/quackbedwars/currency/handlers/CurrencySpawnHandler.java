@@ -126,21 +126,25 @@ public class CurrencySpawnHandler {
 				}
 
 				CurrencySpawner spawner = spawners.getValue();
-				spawner.getHologram().setLocation(location);
-				spawner.formatHologram();
+				if (spawner.isActive()) {
+					spawner.getHologram().setLocation(location);
+					spawner.formatHologram();
+				}
 			}
 
 			spawningTask = Bukkit.getScheduler().runTaskTimer(ProtectTheEgg.getInstance(), () -> {
 				for (Entry<Location, CurrencySpawner> spawners : spawnerLocations.entrySet()) {
 					CurrencySpawner spawner = spawners.getValue();
-					spawner.formatHologram();
+					if (spawner.isActive()) {
+						spawner.formatHologram();
 
-					for (CurrencySpawnRate spawnRate : spawner.getSpawnRates()) {
-						if (spawnRate.getInternalSecond() == spawnRate.getSecondsPerSpawn()) {
-							spawnRate.dropItems(spawners.getKey());
+						for (CurrencySpawnRate spawnRate : spawner.getSpawnRates()) {
+							if (spawnRate.getInternalSecond() == spawnRate.getSecondsPerSpawn()) {
+								spawnRate.dropItems(spawners.getKey());
+							}
+
+							spawnRate.incrementInternalSecond();
 						}
-
-						spawnRate.incrementInternalSecond();
 					}
 				}
 			}, ticksDelay, 20);

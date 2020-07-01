@@ -22,7 +22,7 @@ import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.Statistic;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
-import uk.co.harieo.quackbedwars.teams.TeamHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
 
 /**
  * Handler for the end of game processes

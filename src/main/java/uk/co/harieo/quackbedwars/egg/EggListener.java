@@ -13,7 +13,7 @@ import net.md_5.bungee.api.ChatColor;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.players.Statistic;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
-import uk.co.harieo.quackbedwars.teams.TeamHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
 
 public class EggListener implements Listener {
 
@@ -74,6 +74,15 @@ public class EggListener implements Listener {
 				ProtectTheEgg.getInstance().getLogger()
 						.warning("A dragon egg was broken but it doesn't belong to any team");
 			}
+		}
+	}
+
+	@EventHandler
+	public void onBlockBreak(BlockBreakEvent event) {
+		// If the block above the broken block is a known egg, prevent it being broken as eggs will fall
+		Location location = event.getBlock().getLocation().clone().add(0, 1, 0);
+		if (EggData.getFromCachedBlock(location.getBlock()) != null) {
+			event.setCancelled(true);
 		}
 	}
 

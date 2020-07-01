@@ -1,4 +1,4 @@
-package uk.co.harieo.quackbedwars.teams;
+package uk.co.harieo.quackbedwars.teams.handlers;
 
 import org.bukkit.Location;
 
@@ -6,6 +6,7 @@ import java.util.*;
 import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 
 public class TeamSpawnHandler {
 

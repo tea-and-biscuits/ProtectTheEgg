@@ -65,7 +65,7 @@ public class EggData {
 	}
 
 	/**
-	 * Sets the material of the {@link #getEggBlock()} to a dragon egg
+	 * Sets the material of the {@link #getEggBlock()} to a dragon egg and the block underneath to bedrock
 	 */
 	public void setBlockMaterial() {
 		eggBlock.setType(Material.DRAGON_EGG);

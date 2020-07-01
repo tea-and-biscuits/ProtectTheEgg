@@ -35,7 +35,9 @@ public class ShopHandler {
 				Location location = pair.getLocation();
 				World world = location.getWorld();
 				if (world != null) {
-					Villager villager = (Villager) world.spawnEntity(location, EntityType.VILLAGER);
+					Location centeredLocation = new Location(world, location.getX() + 0.5, location.getY(),
+							location.getZ() + 0.5, location.getYaw(), location.getPitch());
+					Villager villager = (Villager) world.spawnEntity(centeredLocation, EntityType.VILLAGER);
 					villager.setProfession(type.getVillagerProfession());
 					villager.setAI(false);
 					shopNPCs.put(villager, type);

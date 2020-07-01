@@ -64,4 +64,9 @@ public interface CurrencySpawner {
 		hologram.updateLines();
 	}
 
+	/**
+	 * @return whether this spawner should actively spawn items
+	 */
+	boolean isActive();
+
 }

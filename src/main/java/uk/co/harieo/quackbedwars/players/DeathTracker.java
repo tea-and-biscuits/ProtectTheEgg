@@ -24,8 +24,8 @@ import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.stages.GameEndStage;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
-import uk.co.harieo.quackbedwars.teams.TeamHandler;
-import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
 public class DeathTracker implements Listener {
 

@@ -10,7 +10,7 @@ import uk.co.harieo.minigames.menus.MenuItem;
 import uk.co.harieo.quackbedwars.shops.ShopMenu;
 import uk.co.harieo.quackbedwars.shops.ShopType;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
-import uk.co.harieo.quackbedwars.teams.TeamHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
 import uk.co.harieo.quackbedwars.teams.upgrades.TeamUpgrade;
 
 public class UpgradeCategory extends MenuItem {

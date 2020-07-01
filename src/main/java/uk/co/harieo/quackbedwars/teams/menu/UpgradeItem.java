@@ -13,7 +13,7 @@ import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.handlers.CurrencyHandler;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
-import uk.co.harieo.quackbedwars.teams.TeamHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
 import uk.co.harieo.quackbedwars.teams.upgrades.TeamUpgrade;
 
 public class UpgradeItem extends MenuItem {

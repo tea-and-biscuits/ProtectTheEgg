@@ -19,7 +19,7 @@ public class MapCommand implements CommandExecutor {
 	private static final Set<Subcommand> subcommands = Sets
 			.newHashSet(new ResourceSpawnSubcommands(), new EggSpawnSubcommands(),
 					new MetadataSubcommand(ProtectTheEgg.PREFIX), new PlayerSpawnSubcommands(), new MapInfoSubcommand(),
-					new ShopNPCSubcommands());
+					new ShopNPCSubcommands(), new ScanMapSubcommand());
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {

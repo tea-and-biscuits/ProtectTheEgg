@@ -47,4 +47,9 @@ public class SingleCurrencySpawner implements CurrencySpawner {
 		return hologram;
 	}
 
+	@Override
+	public boolean isActive() {
+		return true;
+	}
+
 }

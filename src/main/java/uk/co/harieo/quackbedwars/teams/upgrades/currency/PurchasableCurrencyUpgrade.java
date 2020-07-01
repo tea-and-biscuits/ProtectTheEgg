@@ -52,6 +52,14 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 	private final PurchasableCurrencyUpgrade parent;
 	private PurchasableCurrencyUpgrade child;
 
+	/**
+	 * An upgrade which a {@link BedWarsTeam} can purchase to upgrade their individual currency spawner
+	 *
+	 * @param name of this upgrade
+	 * @param diamondCost which this upgrade costs
+	 * @param parent the parent upgrade, if applicable
+	 * @param newSpawnRates the spawn rates which this adds or increases upon purchase
+	 */
 	PurchasableCurrencyUpgrade(String name, int diamondCost, PurchasableCurrencyUpgrade parent, CurrencySpawnRate... newSpawnRates) {
 		this.name = name;
 		this.diamondCost = diamondCost;
@@ -70,6 +78,13 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 		}
 	}
 
+	/**
+	 * An overload of this class which has no parent
+	 *
+	 * @param name of this upgrade
+	 * @param diamondCost which this upgrade costs
+	 * @param newSpawnRates the spawn rates which this adds or increases upon purchase
+	 */
 	PurchasableCurrencyUpgrade(String name, int diamondCost, CurrencySpawnRate... newSpawnRates) {
 		this(name, diamondCost, null, newSpawnRates);
 	}
@@ -128,18 +143,33 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 		return spawnRates;
 	}
 
+	/**
+	 * @return the parent of this upgrade or null if no parent exists
+	 */
 	public PurchasableCurrencyUpgrade getParent() {
 		return parent;
 	}
 
+	/**
+	 * @return the child of this upgrade or null if none exists
+	 */
 	public PurchasableCurrencyUpgrade getChild() {
 		return child;
 	}
 
+	/**
+	 * Sets this upgrade's child
+	 *
+	 * @param child of this upgrade
+	 */
 	private void setChild(PurchasableCurrencyUpgrade child) {
 		this.child = child;
 	}
 
+	/**
+	 * Creates a default description for this upgrade based on its spawn rates. This is not done in the constructor
+	 * because it is a sizable method, which impacts the readability.
+	 */
 	private void setDescription() {
 		StringBuilder descriptionBuilder = new StringBuilder();
 		descriptionBuilder.append(ChatColor.GRAY);
@@ -152,10 +182,10 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 		for (Currency currency : upgradedCurrencies) {
 			descriptionBuilder.append(currency.getColor());
 			descriptionBuilder.append(currency.getName());
-			if (iterations + 2 < upgradesSize) {
+			if (iterations + 2 < upgradesSize) { // If there are at least 2 iterations left
 				descriptionBuilder.append(ChatColor.GRAY);
 				descriptionBuilder.append(", ");
-			} else if (iterations + 1 < upgradesSize) {
+			} else if (iterations + 1 < upgradesSize) { // If this is the second to last iteration
 				descriptionBuilder.append(ChatColor.GRAY);
 				descriptionBuilder.append(" and ");
 			}
@@ -168,6 +198,9 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 		this.description = descriptionBuilder.toString();
 	}
 
+	/**
+	 * @return the upgrade category which shows these upgrades
+	 */
 	public static UpgradeCategory getCategory() {
 		return category;
 	}

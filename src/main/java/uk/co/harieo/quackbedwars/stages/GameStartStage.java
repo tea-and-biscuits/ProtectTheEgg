@@ -2,6 +2,7 @@ package uk.co.harieo.quackbedwars.stages;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 
@@ -15,6 +16,7 @@ import uk.co.harieo.minigames.timing.GameTimer;
 import uk.co.harieo.minigames.timing.Timer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.handlers.CurrencySpawnHandler;
+import uk.co.harieo.quackbedwars.currency.spawners.TeamSpawner;
 import uk.co.harieo.quackbedwars.egg.EggData;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.PlayerEffects;
@@ -23,8 +25,8 @@ import uk.co.harieo.quackbedwars.scoreboard.PlayersLeftElement;
 import uk.co.harieo.quackbedwars.scoreboard.StatisticsElement;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
-import uk.co.harieo.quackbedwars.teams.TeamHandler;
-import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
 public class GameStartStage {
 
@@ -55,6 +57,7 @@ public class GameStartStage {
 		plugin.setGameStage(GameStage.PRE_GAME);
 		MinigamesCore.setAcceptingPlayers(false);
 
+		// Announce the map name and author to give them credit
 		MapImpl gameMap = plugin.getGameWorldConfig().getGameMap();
 		Bukkit.broadcastMessage("");
 		Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
@@ -64,31 +67,29 @@ public class GameStartStage {
 		Bukkit.broadcastMessage("");
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			BedWarsTeam team = TeamHandler.getTeam(player);
-			if (team == null) {
-				team = TeamHandler.assignTeam(player);
-				if (team == null) {
-					player.kickPlayer(ChatColor.RED + "An error has occurred assigning you a team!");
-					plugin.getLogger().severe("Failed to assign " + player.getName() + " a team");
-					continue;
-				} else {
-					player.sendMessage(ProtectTheEgg.formatMessage(
-							ChatColor.GRAY + "You have been auto-magically assigned to the " + team.getChatColor()
-									+ team.getName() + " Team"));
-				}
-			}
-
-			EggData eggData = TeamGameData.getGameData(team).getEggData();
-			if (eggData != null) {
-				eggData.setBlockMaterial();
-			}
-
-			player.teleport(Objects.requireNonNull(TeamSpawnHandler.getSpawn(team),
-					"No spawn available for " + team.getName() + " team"));
-			DeathTracker.markAlive(player);
-			mainScoreboard.render(plugin, player, 20);
+			assignPlayerTeam(plugin, player); // Assign a team
+			DeathTracker.markAlive(player); // Mark the player as in the game
+			showScoreboard(player); // Show the scoreboard
 		}
 
+		// Activate team assets if the team has at least 1 member playing in it
+		for (BedWarsTeam team : BedWarsTeam.values()) {
+			if (team.getOnlineMembers().size() > 0) {
+				// Activate team's spawner
+				TeamSpawner spawner = TeamSpawner.getCachedSpawner(team);
+				if (spawner != null) {
+					spawner.setActive(true);
+				}
+
+				// Set team's egg
+				EggData eggData = TeamGameData.getGameData(team).getEggData();
+				if (eggData != null) {
+					eggData.setBlockMaterial();
+				}
+			}
+		}
+
+		// Starting spawning items and release players after small delay
 		int seconds = 5;
 		CurrencySpawnHandler.startSpawning(seconds * 20);
 		new Timer(ProtectTheEgg.getInstance(), seconds)
@@ -104,9 +105,15 @@ public class GameStartStage {
 				}).start();
 	}
 
+	/**
+	 * Sets the game to in-game, starts the timer then frees players into the game
+	 *
+	 * @param plugin which is running this game
+	 */
 	private static void releasePlayers(ProtectTheEgg plugin) {
 		plugin.setGameStage(GameStage.IN_GAME);
 		gameTimer.start();
+		PregameCages.deleteCages();
 	}
 
 	/**
@@ -127,6 +134,44 @@ public class GameStartStage {
 					ChatColor.GRAY + "The game will be " + ChatColor.RED + "a draw " + ChatColor.GRAY + "in "
 							+ secondsLeft + " seconds!"));
 		}
+	}
+
+	/**
+	 * Assigns a {@link BedWarsTeam} to a player if they don't already have one then teleports them to that team's
+	 * spawn
+	 *
+	 * @param plugin which is starting the game
+	 * @param player to assign a team to
+	 */
+	private static void assignPlayerTeam(ProtectTheEgg plugin, Player player) {
+		BedWarsTeam team = TeamHandler.getTeam(player);
+		if (team == null) {
+			team = TeamHandler.assignTeam(player);
+			if (team == null) {
+				player.kickPlayer(ChatColor.RED + "An error has occurred assigning you a team!");
+				plugin.getLogger().severe("Failed to assign " + player.getName() + " a team");
+				return; // Can't proceed to spawn if the team is null
+			} else {
+				player.sendMessage(ProtectTheEgg.formatMessage(
+						ChatColor.GRAY + "You have been auto-magically assigned to the " + team.getChatColor()
+								+ team.getName() + " Team"));
+			}
+		}
+
+		Location blockSpawn = Objects
+				.requireNonNull(TeamSpawnHandler.getSpawn(team), "No spawn available for " + team.getName() + " team");
+		Location centeredSpawn = new Location(blockSpawn.getWorld(), blockSpawn.getX() + 0.5, blockSpawn.getY(),
+				blockSpawn.getZ() + 0.5);
+		PregameCages.createCage(centeredSpawn);
+		player.teleport(centeredSpawn);
+		PlayerEffects.giveOneTimeFallImmunity(player); // Prevent them taking fall damage when the cage is deleted
+	}
+
+	/**
+	 * Shows the in-game scoreboard to a player
+	 */
+	public static void showScoreboard(Player player) {
+		mainScoreboard.render(ProtectTheEgg.getInstance(), player, 20);
 	}
 
 }

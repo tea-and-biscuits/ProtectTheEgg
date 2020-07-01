@@ -2,6 +2,7 @@ package uk.co.harieo.quackbedwars.commands.maps;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -12,7 +13,7 @@ import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
-import uk.co.harieo.quackbedwars.teams.TeamSpawnHandler;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
 public class PlayerSpawnSubcommands implements Subcommand {
 
@@ -91,6 +92,7 @@ public class PlayerSpawnSubcommands implements Subcommand {
 							+ ChatColor.GRAY
 							+ "spawn point!"));
 			TeamSpawnHandler.addSpawnLocation(team, location); // Caches the location so it doesn't need re-parsing
+			location.clone().subtract(0, 1, 0).getBlock().setType(Material.GLASS);
 		}
 	}
 
@@ -119,6 +121,7 @@ public class PlayerSpawnSubcommands implements Subcommand {
 			if (removedOnce) {
 				player.sendMessage(ProtectTheEgg.formatMessage(
 						ChatColor.GRAY + "The spawn at your location has been " + ChatColor.RED + "deleted"));
+				location.clone().subtract(0, 1, 0).getBlock().setType(Material.AIR);
 			} else {
 				player.sendMessage(
 						ProtectTheEgg.formatMessage(ChatColor.RED + "There is no spawn marked at your location"));
