@@ -42,7 +42,7 @@ public class ShopHandler {
 					villager.setAI(false);
 					shopNPCs.put(villager, type);
 
-					Hologram hologram = new Hologram().setLocation(location.clone().add(0, 1, 0));
+					Hologram hologram = new Hologram().setLocation(centeredLocation.clone().add(0, 1, 0));
 					hologram.addLine(type.getColor() + type.getShopName());
 					hologram.updateLines();
 

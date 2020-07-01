@@ -6,6 +6,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 
 import java.util.List;
 import java.util.Random;
+import uk.co.harieo.minigames.games.DefaultMinigame;
 import uk.co.harieo.minigames.games.GameStage;
 import uk.co.harieo.minigames.games.Minigame;
 import uk.co.harieo.minigames.scoreboards.GameBoard;
@@ -13,24 +14,28 @@ import uk.co.harieo.minigames.scoreboards.elements.ConstantElement;
 import uk.co.harieo.minigames.timing.LobbyTimer;
 import uk.co.harieo.quackbedwars.commands.ForceStartCommand;
 import uk.co.harieo.quackbedwars.commands.MapCommand;
+import uk.co.harieo.quackbedwars.commands.TeamSelectCommand;
 import uk.co.harieo.quackbedwars.config.GameConfig;
 import uk.co.harieo.quackbedwars.config.GameWorldConfig;
 import uk.co.harieo.quackbedwars.egg.EggListener;
 import uk.co.harieo.quackbedwars.listeners.ConnectionListener;
+import uk.co.harieo.quackbedwars.listeners.LobbyHotbarListener;
 import uk.co.harieo.quackbedwars.listeners.WorldProtectionListener;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.PlayerEffects;
+import uk.co.harieo.quackbedwars.scoreboard.BedWarsProcessor;
 import uk.co.harieo.quackbedwars.scoreboard.PlayerCountElement;
 import uk.co.harieo.quackbedwars.scoreboard.TeamNameElement;
 import uk.co.harieo.quackbedwars.shops.ShopMenu;
 import uk.co.harieo.quackbedwars.shops.ShopNPCListener;
 import uk.co.harieo.quackbedwars.shops.ShopType;
+import uk.co.harieo.quackbedwars.stages.GameEndStage;
 import uk.co.harieo.quackbedwars.stages.GameStartStage;
 import uk.co.harieo.quackbedwars.teams.upgrades.currency.PurchasableCurrencyUpgrade;
 import uk.co.harieo.quackbedwars.teams.upgrades.traps.PurchasableTraps;
 import uk.co.harieo.quackbedwars.teams.upgrades.traps.TrapListener;
 
-public class ProtectTheEgg extends Minigame {
+public class ProtectTheEgg extends DefaultMinigame {
 
 	public static final char ARROWS = '»';
 	public static final String PREFIX =
@@ -77,9 +82,10 @@ public class ProtectTheEgg extends Minigame {
 
 		setupScoreboard();
 		registerListeners(new ConnectionListener(), new WorldProtectionListener(), new EggListener(),
-				new DeathTracker(), new ShopNPCListener(), new TrapListener(), new PlayerEffects());
+				new DeathTracker(), new ShopNPCListener(), new TrapListener(), new PlayerEffects(), new LobbyHotbarListener(this));
 		registerCommand(new MapCommand(), "map", "maps");
 		registerCommand(new ForceStartCommand(), "force", "forcestart");
+		registerCommand(new TeamSelectCommand(), "team");
 		setGameStage(isDevelopmentMode ? GameStage.ERROR : GameStage.LOBBY);
 	}
 
@@ -106,6 +112,7 @@ public class ProtectTheEgg extends Minigame {
 		}
 		lobbyScoreboard.addBlankLine();
 		lobbyScoreboard.addLine(IP_ELEMENT);
+		lobbyScoreboard.getTabListFactory().injectProcessor(BedWarsProcessor.INSTANCE);
 	}
 
 	public void setLobbyScoreboard(Player player) {
@@ -118,10 +125,6 @@ public class ProtectTheEgg extends Minigame {
 
 	public GameWorldConfig getGameWorldConfig() {
 		return getGameConfig().getGameWorldConfig();
-	}
-
-	public GameStage getGameStage() {
-		return stage;
 	}
 
 	public void setGameStage(GameStage gameStage) {
@@ -147,12 +150,23 @@ public class ProtectTheEgg extends Minigame {
 		return maxPlayers / 2;
 	}
 
+	@Override
+	public GameStage getGameStage() {
+		return stage;
+	}
+
 	public static ProtectTheEgg getInstance() {
 		return instance;
 	}
 
 	public static String formatMessage(String message) {
 		return PREFIX + message;
+	}
+
+	public static void updateTabListProcessors() {
+		lobbyScoreboard.getTabListFactory().injectAllPlayers();
+		GameStartStage.updateTabListHandler();
+		GameEndStage.updateTabListHandler();
 	}
 
 }

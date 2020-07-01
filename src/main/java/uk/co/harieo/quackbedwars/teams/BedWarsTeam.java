@@ -11,23 +11,25 @@ import java.util.function.Predicate;
 import net.md_5.bungee.api.ChatColor;
 import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
 public enum BedWarsTeam {
 
-	GREEN("Green", ChatColor.GREEN, Color.LIME, Material.GREEN_STAINED_GLASS),
-	DARK_GREEN("Dark Green", ChatColor.DARK_GREEN, Color.GREEN, Material.GREEN_STAINED_GLASS),
-	YELLOW("Yellow", ChatColor.YELLOW, Color.YELLOW, Material.YELLOW_STAINED_GLASS),
-	RED("Red", ChatColor.RED, Color.RED, Material.RED_STAINED_GLASS),
-	DARK_RED("Dark Red", ChatColor.DARK_RED, Color.RED, Material.RED_STAINED_GLASS),
-	GRAY("Grey", ChatColor.GRAY, Color.GRAY, Material.LIGHT_GRAY_STAINED_GLASS),
-	DARK_GRAY("Dark Grey", ChatColor.DARK_GRAY, Color.GRAY, Material.GRAY_STAINED_GLASS),
-	AQUA("Aqua", ChatColor.AQUA, Color.AQUA, Material.LIGHT_BLUE_STAINED_GLASS),
-	BLUE("Blue", ChatColor.BLUE, Color.BLUE, Material.BLUE_STAINED_GLASS),
-	DARK_BLUE("Dark Blue", ChatColor.DARK_BLUE, Color.BLUE, Material.BLUE_STAINED_GLASS),
-	PURPLE("Purple", ChatColor.LIGHT_PURPLE, Color.PURPLE, Material.PURPLE_STAINED_GLASS),
-	DARK_PURPLE("Dark Purple", ChatColor.DARK_PURPLE, Color.PURPLE, Material.PURPLE_STAINED_GLASS),
-	GOLD("Orange", ChatColor.GOLD, Color.ORANGE, Material.ORANGE_STAINED_GLASS);
+	GREEN('G', "Green", ChatColor.GREEN, Color.LIME, Material.GREEN_STAINED_GLASS),
+	DARK_GREEN('G', "Dark Green", ChatColor.DARK_GREEN, Color.GREEN, Material.GREEN_STAINED_GLASS),
+	YELLOW('Y', "Yellow", ChatColor.YELLOW, Color.YELLOW, Material.YELLOW_STAINED_GLASS),
+	RED('R', "Red", ChatColor.RED, Color.RED, Material.RED_STAINED_GLASS),
+	DARK_RED('R', "Dark Red", ChatColor.DARK_RED, Color.RED, Material.RED_STAINED_GLASS),
+	GRAY('G', "Grey", ChatColor.GRAY, Color.GRAY, Material.LIGHT_GRAY_STAINED_GLASS),
+	DARK_GRAY('G', "Dark Grey", ChatColor.DARK_GRAY, Color.GRAY, Material.GRAY_STAINED_GLASS),
+	AQUA('A', "Aqua", ChatColor.AQUA, Color.AQUA, Material.LIGHT_BLUE_STAINED_GLASS),
+	BLUE('B', "Blue", ChatColor.BLUE, Color.BLUE, Material.BLUE_STAINED_GLASS),
+	DARK_BLUE('B', "Dark Blue", ChatColor.DARK_BLUE, Color.BLUE, Material.BLUE_STAINED_GLASS),
+	PURPLE('P', "Purple", ChatColor.LIGHT_PURPLE, Color.PURPLE, Material.PURPLE_STAINED_GLASS),
+	DARK_PURPLE('P', "Dark Purple", ChatColor.DARK_PURPLE, Color.PURPLE, Material.PURPLE_STAINED_GLASS),
+	GOLD('O', "Orange", ChatColor.GOLD, Color.ORANGE, Material.ORANGE_STAINED_GLASS);
 
+	private final char teamChar;
 	private final String name;
 	private final ChatColor chatColor;
 	private final Color armourColor;
@@ -35,12 +37,17 @@ public enum BedWarsTeam {
 
 	private final Team team;
 
-	BedWarsTeam(String name, ChatColor chatColor, Color armourColor, Material cageMaterial) {
+	BedWarsTeam(char teamChar, String name, ChatColor chatColor, Color armourColor, Material cageMaterial) {
+		this.teamChar = teamChar;
 		this.name = name;
 		this.chatColor = chatColor;
 		this.armourColor = armourColor;
 		this.cageMaterial = cageMaterial;
 		this.team = new Team(name, chatColor, armourColor, Bukkit.getMaxPlayers()); // Max players is handled elsewhere
+	}
+
+	public char getTeamChar() {
+		return teamChar;
 	}
 
 	public String getName() {
@@ -80,7 +87,12 @@ public enum BedWarsTeam {
 	}
 
 	public boolean isTeamActive() {
-		return ordinal() < ProtectTheEgg.getInstance().getGameConfig().getMaxTeams();
+		return ordinal() < ProtectTheEgg.getInstance().getGameConfig().getMaxTeams()
+				&& !TeamSpawnHandler.getSpawnLocations(this).isEmpty();
+	}
+
+	public boolean isFull() {
+		return getMembers().size() >= ProtectTheEgg.getInstance().getGameConfig().getPlayersPerTeam();
 	}
 
 	@Override

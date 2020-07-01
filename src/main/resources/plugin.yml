@@ -17,6 +17,8 @@ commands:
         permission: 'quacktopia.minigames.force'
         aliases:
             - forcestart
+    team:
+        description: 'Allows you to switch teams'
 
 permissions:
     quacktopia.minigames.join:

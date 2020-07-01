@@ -8,10 +8,10 @@ import org.bukkit.scoreboard.DisplaySlot;
 
 import java.util.Objects;
 import uk.co.harieo.minigames.MinigamesCore;
+import uk.co.harieo.minigames.events.MinigameStartEvent;
 import uk.co.harieo.minigames.games.GameStage;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.minigames.scoreboards.GameBoard;
-import uk.co.harieo.minigames.scoreboards.elements.ConstantElement;
 import uk.co.harieo.minigames.timing.GameTimer;
 import uk.co.harieo.minigames.timing.Timer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
@@ -20,9 +20,8 @@ import uk.co.harieo.quackbedwars.currency.spawners.TeamSpawner;
 import uk.co.harieo.quackbedwars.egg.EggData;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.PlayerEffects;
-import uk.co.harieo.quackbedwars.players.Statistic;
-import uk.co.harieo.quackbedwars.scoreboard.PlayersLeftElement;
-import uk.co.harieo.quackbedwars.scoreboard.StatisticsElement;
+import uk.co.harieo.quackbedwars.scoreboard.BedWarsProcessor;
+import uk.co.harieo.quackbedwars.scoreboard.TeamStatusElement;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
@@ -35,27 +34,21 @@ public class GameStartStage {
 	private static final GameTimer gameTimer = new GameTimer(ProtectTheEgg.getInstance(), 60 * 20);
 
 	static {
-		mainScoreboard.addBlankLine();
-		mainScoreboard.addLine(new ConstantElement(ChatColor.GREEN + ChatColor.BOLD.toString() + "Time Left"));
-		mainScoreboard.addLine(gameTimer);
-		mainScoreboard.addBlankLine();
-		mainScoreboard.addLine(new ConstantElement(ChatColor.YELLOW + ChatColor.BOLD.toString() + "Players Left"));
-		mainScoreboard.addLine(new PlayersLeftElement());
-		mainScoreboard.addBlankLine();
-		mainScoreboard.addLine(new ConstantElement(ChatColor.GOLD + ChatColor.BOLD.toString() + "Your Kills"));
-		mainScoreboard.addLine(new StatisticsElement(Statistic.KILLS));
-		mainScoreboard.addBlankLine();
-		mainScoreboard.addLine(ProtectTheEgg.IP_ELEMENT);
+		mainScoreboard.getTabListFactory().injectProcessor(BedWarsProcessor.INSTANCE);
 
 		gameTimer.setPrefix(ProtectTheEgg.PREFIX);
 		gameTimer.setOnTimerTick(GameStartStage::onTick);
 		gameTimer.setOnTimerEnd(end -> GameEndStage.forceDraw());
 	}
 
+	/**
+	 * Starts this game, marks this server as no longer accepting new connections and activates all in-game systems
+	 */
 	public static void startGame() {
 		ProtectTheEgg plugin = ProtectTheEgg.getInstance();
 		plugin.setGameStage(GameStage.PRE_GAME);
 		MinigamesCore.setAcceptingPlayers(false);
+		Bukkit.getPluginManager().callEvent(new MinigameStartEvent(plugin));
 
 		// Announce the map name and author to give them credit
 		MapImpl gameMap = plugin.getGameWorldConfig().getGameMap();
@@ -69,6 +62,11 @@ public class GameStartStage {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			assignPlayerTeam(plugin, player); // Assign a team
 			DeathTracker.markAlive(player); // Mark the player as in the game
+		}
+
+		// Scoreboard requires that all teams be assigned before formatting, which is in the loop above
+		formatScoreboard();
+		for (Player player : Bukkit.getOnlinePlayers()) {
 			showScoreboard(player); // Show the scoreboard
 		}
 
@@ -167,11 +165,32 @@ public class GameStartStage {
 		PlayerEffects.giveOneTimeFallImmunity(player); // Prevent them taking fall damage when the cage is deleted
 	}
 
+	private static void formatScoreboard() {
+		mainScoreboard.addBlankLine();
+		int index = 0;
+		for (BedWarsTeam team : BedWarsTeam.values()) {
+			if (index < 13) { // Done so that it only increments on a successful line
+				if (team.isTeamActive() && team.getMembers().size() > 0) {
+					mainScoreboard.addLine(new TeamStatusElement(team));
+					index++;
+				}
+			} else {
+				break;
+			}
+		}
+		mainScoreboard.addBlankLine();
+		mainScoreboard.addLine(ProtectTheEgg.IP_ELEMENT);
+	}
+
 	/**
 	 * Shows the in-game scoreboard to a player
 	 */
 	public static void showScoreboard(Player player) {
 		mainScoreboard.render(ProtectTheEgg.getInstance(), player, 20);
+	}
+
+	public static void updateTabListHandler() {
+		mainScoreboard.getTabListFactory().injectAllPlayers();
 	}
 
 }

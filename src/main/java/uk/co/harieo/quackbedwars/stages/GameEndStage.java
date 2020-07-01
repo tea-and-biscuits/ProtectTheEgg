@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import net.md_5.bungee.api.ChatColor;
 import uk.co.harieo.minigames.MinigamesCore;
+import uk.co.harieo.minigames.events.MinigameEndEvent;
 import uk.co.harieo.minigames.games.GameStage;
 import uk.co.harieo.minigames.scoreboards.GameBoard;
 import uk.co.harieo.minigames.scoreboards.elements.ConstantElement;
@@ -21,6 +22,7 @@ import uk.co.harieo.minigames.timing.Timer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.Statistic;
+import uk.co.harieo.quackbedwars.scoreboard.BedWarsProcessor;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
 
@@ -31,6 +33,10 @@ public class GameEndStage {
 
 	private static final GameBoard endingScoreboard = new GameBoard(
 			ChatColor.GOLD + ChatColor.BOLD.toString() + "Protect the Egg", DisplaySlot.SIDEBAR);
+
+	static {
+		endingScoreboard.getTabListFactory().injectProcessor(BedWarsProcessor.INSTANCE);
+	}
 
 	/**
 	 * Checks whether there is only 1 team standing, which is a win, and begins the end stage for that team with {@link
@@ -82,6 +88,10 @@ public class GameEndStage {
 		startFireworks(fireworkEffect, DeathTracker.getLivingPlayers());
 
 		startSelfDestruct();
+	}
+
+	public static void updateTabListHandler() {
+		endingScoreboard.getTabListFactory().injectAllPlayers();
 	}
 
 	/**
@@ -178,6 +188,7 @@ public class GameEndStage {
 	private static void setEndingState() {
 		ProtectTheEgg plugin = ProtectTheEgg.getInstance();
 		plugin.setGameStage(GameStage.ENDING);
+		Bukkit.getPluginManager().callEvent(new MinigameEndEvent(plugin));
 	}
 
 	/**

@@ -14,7 +14,7 @@ public class TeamStatusElement implements RenderableElement {
 
 	public TeamStatusElement(BedWarsTeam team) {
 		this.team = team;
-		this.teamName = team.getChatColor() + ChatColor.BOLD.toString() + team.getName() + " Team";
+		this.teamName = team.getChatColor().toString() + team.getTeamChar() + ChatColor.WHITE + ": " + team.getName();
 	}
 
 	@Override
@@ -22,13 +22,13 @@ public class TeamStatusElement implements RenderableElement {
 		TeamGameData gameData = TeamGameData.getGameData(team);
 		String status;
 		if (gameData.isEggIntact()) {
-			status = ChatColor.GREEN + "✓";
+			status = ChatColor.GREEN + ChatColor.BOLD.toString() + "✓";
 		} else if (gameData.getPlayersAlive() > 0) {
 			status = ChatColor.YELLOW + String.valueOf(gameData.getPlayersAlive());
 		} else {
-			status = ChatColor.RED + "✗";
+			status = ChatColor.RED + ChatColor.BOLD.toString() + "✗";
 		}
-		return teamName + ": " + status;
+		return teamName + ChatColor.WHITE + ": " + status;
 	}
 
 }

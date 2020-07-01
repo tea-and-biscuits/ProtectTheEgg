@@ -36,6 +36,7 @@ public class TeamHandler {
 		playerTeams.put(player.getUniqueId(), team);
 		team.addMember(player);
 		TeamGameData.getGameData(team).incrementPlayersAlive();
+		ProtectTheEgg.updateTabListProcessors();
 	}
 
 	public static void unsetTeam(Player player) {

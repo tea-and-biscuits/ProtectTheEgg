@@ -14,6 +14,7 @@ import java.util.Set;
 import uk.co.harieo.minigames.games.GameStage;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.egg.EggData;
+import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
@@ -27,6 +28,10 @@ public class TrapListener implements Listener {
 		}
 
 		Player player = event.getPlayer();
+		if (!DeathTracker.isAlive(player)) {
+			return;
+		}
+
 		Map<Block, EggData> eggDataMap = EggData.getCachedEggs();
 		for (Block block : eggDataMap.keySet()) {
 			BedWarsTeam eggOwnerTeam = eggDataMap.get(block).getTeam();
