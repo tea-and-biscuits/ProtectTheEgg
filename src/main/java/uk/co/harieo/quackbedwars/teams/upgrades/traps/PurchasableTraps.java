@@ -11,7 +11,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.Consumer;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 import uk.co.harieo.quackbedwars.teams.menu.UpgradeCategory;
 import uk.co.harieo.quackbedwars.teams.upgrades.TeamUpgrade;
@@ -25,7 +25,7 @@ public enum PurchasableTraps implements TeamUpgrade {
 	LIGHTNING("Lightning Trap", "Strikes the power of zeus into anyone who comes near your egg", 2,
 			player -> player.getWorld().strikeLightning(player.getLocation()));
 
-	private static UpgradeCategory category;
+	private static final UpgradeCategory category;
 
 	static {
 		ItemStack displayItem = new ItemStack(Material.COBWEB);
@@ -75,17 +75,17 @@ public enum PurchasableTraps implements TeamUpgrade {
 	}
 
 	@Override
-	public boolean isUnlocked(BedWarsTeam team) {
+	public boolean isUnlocked(Team team) {
 		return TeamGameData.getGameData(team).getPurchasedTraps().contains(this);
 	}
 
 	@Override
-	public boolean canUnlock(BedWarsTeam team) {
+	public boolean canUnlock(Team team) {
 		return !isUnlocked(team);
 	}
 
 	@Override
-	public void activateUpgrade(BedWarsTeam team) {
+	public void activateUpgrade(Team team) {
 		TeamGameData.getGameData(team).addPurchasedTrap(this);
 	}
 

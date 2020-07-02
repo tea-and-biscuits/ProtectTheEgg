@@ -11,12 +11,13 @@ import uk.co.harieo.minigames.commands.CommandUtils;
 import uk.co.harieo.minigames.commands.Subcommand;
 import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.handlers.CurrencySpawnHandler;
 import uk.co.harieo.quackbedwars.currency.spawners.SingleCurrencySpawner;
 import uk.co.harieo.quackbedwars.currency.spawners.TeamSpawner;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 
 public class ResourceSpawnSubcommands implements Subcommand {
 
@@ -54,7 +55,7 @@ public class ResourceSpawnSubcommands implements Subcommand {
 
 	/**
 	 * The 'setresource' sub-command to the maps command which allows the player to set the location of a resource
-	 * spawner either for a {@link BedWarsTeam} or for a specific {@link Currency}
+	 * spawner either for a {@link BedWarsTeamData} or for a specific {@link Currency}
 	 *
 	 * @param player who has issued the command
 	 * @param args which were supplied with the command
@@ -75,7 +76,7 @@ public class ResourceSpawnSubcommands implements Subcommand {
 			} catch (IllegalArgumentException ignored) {
 			} // Assuming they specified a team instead
 
-			BedWarsTeam team = BedWarsTeam.getByName(name);
+			BedWarsTeamData team = BedWarsTeamData.getByName(name);
 			if (team != null) {
 				setTeamSpawn(player, team);
 			} else { // No valid arguments
@@ -97,14 +98,14 @@ public class ResourceSpawnSubcommands implements Subcommand {
 	}
 
 	/**
-	 * Sets the location for a {@link BedWarsTeam} based resource spawner
+	 * Sets the location for a {@link BedWarsTeamData} based resource spawner
 	 *
 	 * @param player who has issued the command
-	 * @param team which this spawner will belong to
+	 * @param teamData of the team which this spawner will belong to
 	 */
-	private void setTeamSpawn(Player player, BedWarsTeam team) {
-		addLocationIfNotSpawner(player, CurrencySpawnHandler.TEAM_SPAWN_KEY, team.name());
-		CurrencySpawnHandler.addSpawner(player.getLocation(), new TeamSpawner(team));
+	private void setTeamSpawn(Player player, BedWarsTeamData teamData) {
+		addLocationIfNotSpawner(player, CurrencySpawnHandler.TEAM_SPAWN_KEY, teamData.name());
+		CurrencySpawnHandler.addSpawner(player.getLocation(), new TeamSpawner(teamData.getTeam()));
 	}
 
 	/**
@@ -155,7 +156,7 @@ public class ResourceSpawnSubcommands implements Subcommand {
 	}
 
 	/**
-	 * Checks whether a {@link LocationPair} is marked as either a {@link Currency} spawner or a {@link BedWarsTeam}
+	 * Checks whether a {@link LocationPair} is marked as either a {@link Currency} spawner or a {@link BedWarsTeamData}
 	 * spawner
 	 *
 	 * @param pair to be checked

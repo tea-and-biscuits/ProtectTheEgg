@@ -1,22 +1,24 @@
 package uk.co.harieo.quackbedwars.teams.menu;
 
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager.Profession;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import uk.co.harieo.minigames.menus.MenuItem;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
+import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.shops.ShopMenu;
 import uk.co.harieo.quackbedwars.shops.ShopType;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
-import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.upgrades.TeamUpgrade;
 
 public class UpgradeCategory extends MenuItem {
 
 	private final List<TeamUpgrade> upgrades;
-	private final Map<BedWarsTeam, ShopMenu> subMenuMap = new HashMap<>(); // Caches menu items per team
+	private final Map<PlayerBasedTeam, ShopMenu> subMenuMap = new HashMap<>(); // Caches menu items per team
 
 	/**
 	 * A category of {@link TeamUpgrade} which a team can purchase
@@ -31,14 +33,14 @@ public class UpgradeCategory extends MenuItem {
 	}
 
 	/**
-	 * Retrieves the {@link ShopMenu} for the specified player's {@link BedWarsTeam}, or creates it if not cached, then
+	 * Retrieves the {@link ShopMenu} for the specified player's {@link BedWarsTeamData}, or creates it if not cached, then
 	 * updates all the instances of {@link UpgradeItem} to display up-to-date information. The menu is then shown to
 	 * the player.
 	 *
 	 * @param player to show the menu to
 	 */
 	public void showSubMenu(Player player) {
-		BedWarsTeam team = TeamHandler.getTeam(player);
+		PlayerBasedTeam team = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
 		if (team != null) {
 			ShopMenu teamMenu = subMenuMap.get(team);
 			if (teamMenu == null) {

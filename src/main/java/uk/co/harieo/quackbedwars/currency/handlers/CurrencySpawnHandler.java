@@ -11,13 +11,15 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
 import uk.co.harieo.quackbedwars.currency.spawners.CurrencySpawner;
 import uk.co.harieo.quackbedwars.currency.spawners.SingleCurrencySpawner;
 import uk.co.harieo.quackbedwars.currency.spawners.TeamSpawner;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 
 public class CurrencySpawnHandler {
 
@@ -54,7 +56,8 @@ public class CurrencySpawnHandler {
 		for (LocationPair pair : map.getLocationsByKey(TEAM_SPAWN_KEY)) {
 			String teamName = pair.getValue();
 			try {
-				BedWarsTeam team = BedWarsTeam.valueOf(teamName);
+				BedWarsTeamData teamData = BedWarsTeamData.valueOf(teamName);
+				Team team = teamData.getTeam();
 				addSpawner(pair.getLocation(), new TeamSpawner(team));
 				successes++;
 			} catch (IllegalArgumentException ignored) {

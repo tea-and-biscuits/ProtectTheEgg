@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.egg.EggData;
 import uk.co.harieo.quackbedwars.teams.upgrades.currency.BaseCurrencyUpgrade;
 import uk.co.harieo.quackbedwars.teams.upgrades.currency.CurrencyUpgrade;
@@ -12,7 +13,7 @@ import uk.co.harieo.quackbedwars.teams.upgrades.traps.PurchasableTraps;
 
 public class TeamGameData {
 
-	private static final Map<BedWarsTeam, TeamGameData> data = new HashMap<>();
+	private static final Map<Team, TeamGameData> data = new HashMap<>();
 
 	private final Set<PurchasableTraps> purchasedTraps = new HashSet<>();
 	private CurrencyUpgrade currencyUpgrade = BaseCurrencyUpgrade.INSTANCE;
@@ -20,11 +21,11 @@ public class TeamGameData {
 	private int playersAlive = 0;
 
 	/**
-	 * A class which stores basic game data for a {@link BedWarsTeam}
+	 * A class which stores basic game data for a {@link BedWarsTeamData}
 	 *
 	 * @param team which this data represents
 	 */
-	public TeamGameData(BedWarsTeam team) {
+	public TeamGameData(Team team) {
 		data.put(team, this);
 	}
 
@@ -129,7 +130,7 @@ public class TeamGameData {
 	 * @param team to get the game data for
 	 * @return the game data for the team, either from the cache or new if this is the first call
 	 */
-	public static TeamGameData getGameData(BedWarsTeam team) {
+	public static TeamGameData getGameData(Team team) {
 		if (data.containsKey(team)) {
 			return data.get(team);
 		} else {

@@ -6,11 +6,13 @@ import org.bukkit.scoreboard.DisplaySlot;
 
 import java.util.List;
 import java.util.Random;
+
 import uk.co.harieo.minigames.games.DefaultMinigame;
 import uk.co.harieo.minigames.games.GameStage;
-import uk.co.harieo.minigames.games.Minigame;
 import uk.co.harieo.minigames.scoreboards.GameBoard;
 import uk.co.harieo.minigames.scoreboards.elements.ConstantElement;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
+import uk.co.harieo.minigames.teams.TeamHandler;
 import uk.co.harieo.minigames.timing.LobbyTimer;
 import uk.co.harieo.quackbedwars.commands.ForceStartCommand;
 import uk.co.harieo.quackbedwars.commands.MapCommand;
@@ -31,6 +33,7 @@ import uk.co.harieo.quackbedwars.shops.ShopNPCListener;
 import uk.co.harieo.quackbedwars.shops.ShopType;
 import uk.co.harieo.quackbedwars.stages.GameEndStage;
 import uk.co.harieo.quackbedwars.stages.GameStartStage;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.upgrades.currency.PurchasableCurrencyUpgrade;
 import uk.co.harieo.quackbedwars.teams.upgrades.traps.PurchasableTraps;
 import uk.co.harieo.quackbedwars.teams.upgrades.traps.TrapListener;
@@ -51,6 +54,7 @@ public class ProtectTheEgg extends DefaultMinigame {
 	private GameStage stage = GameStage.STARTING;
 	private GameConfig config;
 	private LobbyTimer lobbyTimer;
+	private TeamHandler<PlayerBasedTeam> teamHandler;
 	private int maxPlayers = 12;
 	private boolean isDevelopmentMode = true;
 
@@ -75,6 +79,8 @@ public class ProtectTheEgg extends DefaultMinigame {
 		lobbyTimer.setPrefix(PREFIX);
 		lobbyTimer.setOnTimerEnd(end -> GameStartStage.startGame());
 
+		teamHandler = new TeamHandler<>(BedWarsTeamData.allTeams, getGameConfig().getPlayersPerTeam());
+
 		ShopMenu upgradesMenu = new ShopMenu(ShopType.UPGRADES, 1);
 		ShopType.UPGRADES.setMenu(upgradesMenu);
 		upgradesMenu.setStaticItem(0, PurchasableCurrencyUpgrade.getCategory());
@@ -93,6 +99,26 @@ public class ProtectTheEgg extends DefaultMinigame {
 	public void onDisable() {
 		getLogger().info("Deleting temporary game world...");
 		getGameWorldConfig().unloadTemporaryWorld(this);
+	}
+
+	@Override
+	public String getMinigameName() {
+		return "Protect the Egg";
+	}
+
+	@Override
+	public int getMaxPlayers() {
+		return maxPlayers;
+	}
+
+	@Override
+	public int getOptimalPlayers() {
+		return maxPlayers / 2;
+	}
+
+	@Override
+	public GameStage getGameStage() {
+		return stage;
 	}
 
 	private void setupScoreboard() {
@@ -135,24 +161,8 @@ public class ProtectTheEgg extends DefaultMinigame {
 		return lobbyTimer;
 	}
 
-	@Override
-	public String getMinigameName() {
-		return "Protect the Egg";
-	}
-
-	@Override
-	public int getMaxPlayers() {
-		return maxPlayers;
-	}
-
-	@Override
-	public int getOptimalPlayers() {
-		return maxPlayers / 2;
-	}
-
-	@Override
-	public GameStage getGameStage() {
-		return stage;
+	public TeamHandler<PlayerBasedTeam> getTeamHandler() {
+		return teamHandler;
 	}
 
 	public static ProtectTheEgg getInstance() {

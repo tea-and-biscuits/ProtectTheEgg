@@ -12,12 +12,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import java.util.Map;
 import java.util.Set;
 import uk.co.harieo.minigames.games.GameStage;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.egg.EggData;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
-import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
 
 public class TrapListener implements Listener {
 
@@ -34,11 +33,15 @@ public class TrapListener implements Listener {
 
 		Map<Block, EggData> eggDataMap = EggData.getCachedEggs();
 		for (Block block : eggDataMap.keySet()) {
-			BedWarsTeam eggOwnerTeam = eggDataMap.get(block).getTeam();
-			BedWarsTeam triggersTeam = TeamHandler.getTeam(player);
-			if (eggOwnerTeam != triggersTeam) { // Make sure they're not triggering their own trap
+			PlayerBasedTeam eggOwnerTeam = eggDataMap.get(block).getTeam();
+			PlayerBasedTeam triggersTeam = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
+
+			// Make sure they're not triggering their own trap
+			if (eggOwnerTeam != triggersTeam) {
 				Location blockLocation = block.getLocation();
 				World blockWorld = blockLocation.getWorld();
+
+				// Make sure they're in the same world as this egg
 				if (blockWorld != null && blockWorld.equals(player.getWorld())) {
 					double distance = blockLocation.distance(player.getLocation());
 					if (distance < 5) {

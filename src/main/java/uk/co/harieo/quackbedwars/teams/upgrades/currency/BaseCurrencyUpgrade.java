@@ -3,9 +3,9 @@ package uk.co.harieo.quackbedwars.teams.upgrades.currency;
 import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Map;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 
 public class BaseCurrencyUpgrade implements CurrencyUpgrade {
 
@@ -39,17 +39,17 @@ public class BaseCurrencyUpgrade implements CurrencyUpgrade {
 	}
 
 	@Override
-	public boolean isUnlocked(BedWarsTeam team) {
+	public boolean isUnlocked(Team team) {
 		return true;
 	}
 
 	@Override
-	public boolean canUnlock(BedWarsTeam team) {
+	public boolean canUnlock(Team team) {
 		return false;
 	}
 
 	@Override
-	public void activateUpgrade(BedWarsTeam team) {
+	public void activateUpgrade(Team team) {
 		throw new UnsupportedOperationException("Base upgrade cannot be activated");
 	}
 

@@ -11,8 +11,9 @@ import java.util.Set;
 import uk.co.harieo.minigames.commands.Subcommand;
 import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
 public class PlayerSpawnSubcommands implements Subcommand {
@@ -68,11 +69,14 @@ public class PlayerSpawnSubcommands implements Subcommand {
 			}
 
 			String teamName = builder.toString().trim();
-			BedWarsTeam team = BedWarsTeam.getByName(teamName);
-			if (team == null) {
+			BedWarsTeamData teamData = BedWarsTeamData.getByName(teamName);
+			if (teamData == null) {
 				player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.RED + "Unknown team: " + teamName));
 				return;
 			}
+
+			Team team = teamData.getTeam();
+			String properTeamName = teamData.getTeam().getName(); // Properly formatted as it is the system copy
 
 			MapImpl map = MapImpl.get(player.getWorld());
 			Location location = player.getLocation();
@@ -80,18 +84,18 @@ public class PlayerSpawnSubcommands implements Subcommand {
 				// Overwrite any previous spawns with the requested team
 				for (LocationPair pair : map.getLocationPairs(location)) {
 					if (isTeamSpawn(pair)) {
-						pair.setValue(team.getName()); // Replace it with this team
+						pair.setValue(teamData.name()); // Replace it with this team
 					}
 				}
 			} else {
-				map.addLocation(location, TeamSpawnHandler.SPAWN_KEY, team.getName());
+				map.addLocation(location, TeamSpawnHandler.SPAWN_KEY, properTeamName);
 			}
 
 			player.sendMessage(ProtectTheEgg.formatMessage(
-					ChatColor.GRAY + "Set current location to a " + team.getChatColor() + team.getName() + " "
+					ChatColor.GRAY + "Set current location to a " + team.getChatColor() + properTeamName + " "
 							+ ChatColor.GRAY
 							+ "spawn point!"));
-			TeamSpawnHandler.addSpawnLocation(team, location); // Caches the location so it doesn't need re-parsing
+			team.getSpawns().addSpawn(location); // Caches the location so it doesn't need re-parsing
 			location.clone().subtract(0, 1, 0).getBlock().setType(Material.GLASS);
 		}
 	}
@@ -111,9 +115,10 @@ public class PlayerSpawnSubcommands implements Subcommand {
 					map.removeLocation(pair);
 					removedOnce = true;
 
-					BedWarsTeam team = BedWarsTeam.getByName(pair.getValue());
-					if (team != null) {
-						TeamSpawnHandler.removeSpawnLocation(team, pair.getLocation()); // Removes from the cache
+					BedWarsTeamData teamData = BedWarsTeamData.getByName(pair.getValue());
+					if (teamData != null) {
+						Team team = teamData.getTeam();
+						team.getSpawns().removeSpawn(pair.getLocation()); // Removes from the cache
 					}
 				}
 			}

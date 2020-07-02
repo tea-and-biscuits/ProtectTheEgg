@@ -4,17 +4,18 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import uk.co.harieo.minigames.scoreboards.elements.RenderableElement;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.minigames.teams.Team;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 
 public class TeamStatusElement implements RenderableElement {
 
-	private final BedWarsTeam team;
+	private final Team team;
 	private final String teamName;
 
-	public TeamStatusElement(BedWarsTeam team) {
-		this.team = team;
-		this.teamName = team.getChatColor().toString() + team.getTeamChar() + ChatColor.WHITE + ": " + team.getName();
+	public TeamStatusElement(BedWarsTeamData teamData) {
+		this.team = teamData.getTeam();
+		this.teamName = team.getChatColor().toString() + teamData.getTeamChar() + ChatColor.WHITE + ": " + team.getName();
 	}
 
 	@Override

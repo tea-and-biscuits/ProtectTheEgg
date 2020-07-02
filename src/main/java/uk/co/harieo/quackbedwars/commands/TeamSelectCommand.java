@@ -7,9 +7,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import uk.co.harieo.minigames.commands.CommandUtils;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
-import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 
 public class TeamSelectCommand implements CommandExecutor {
 
@@ -22,15 +22,17 @@ public class TeamSelectCommand implements CommandExecutor {
 			Player player = (Player) sender;
 
 			String teamName = CommandUtils.concatenateArguments(args, 0);
-			BedWarsTeam team = BedWarsTeam.getByName(teamName);
+
+			BedWarsTeamData teamData = BedWarsTeamData.getByName(teamName);
+			PlayerBasedTeam team = teamData.getTeam();
 			if (team != null) {
-				if (team.isFull()) {
+				if (teamData.isFull()) {
 					sender.sendMessage(ProtectTheEgg.formatMessage(ChatColor.RED + "That team is full at the moment!"));
-				} else if (!team.isTeamActive()) {
+				} else if (!teamData.isTeamActive()) {
 					sender.sendMessage(ProtectTheEgg.formatMessage(ChatColor.RED
 							+ "This team isn't available. Check the selection menu for available options!"));
 				} else {
-					TeamHandler.setTeam(player, team);
+					ProtectTheEgg.getInstance().getTeamHandler().setTeam(player, team);
 					sender.sendMessage(ProtectTheEgg
 							.formatMessage(ChatColor.GRAY + "You have joined the " + team.getFormattedName()));
 				}

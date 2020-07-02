@@ -16,7 +16,6 @@ import uk.co.harieo.minigames.timing.LobbyTimer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.stages.GameEndStage;
 import uk.co.harieo.quackbedwars.stages.GameStartStage;
-import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
 
 public class ConnectionListener implements Listener {
 
@@ -75,7 +74,7 @@ public class ConnectionListener implements Listener {
 
 		event.setQuitMessage(ProtectTheEgg
 				.formatMessage(ChatColor.RED + player.getName() + ChatColor.GRAY + " has flown away from the nest!"));
-		TeamHandler.unsetTeam(player);
+		ProtectTheEgg.getInstance().getTeamHandler().unsetTeam(player);
 
 		int playerCount = Bukkit.getOnlinePlayers().size() - 1;
 		GameStage stage = plugin.getGameStage();

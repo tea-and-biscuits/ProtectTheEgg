@@ -11,20 +11,19 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scoreboard.DisplaySlot;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import net.md_5.bungee.api.ChatColor;
 import uk.co.harieo.minigames.MinigamesCore;
 import uk.co.harieo.minigames.events.MinigameEndEvent;
 import uk.co.harieo.minigames.games.GameStage;
 import uk.co.harieo.minigames.scoreboards.GameBoard;
 import uk.co.harieo.minigames.scoreboards.elements.ConstantElement;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
 import uk.co.harieo.minigames.timing.Timer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.Statistic;
 import uk.co.harieo.quackbedwars.scoreboard.BedWarsProcessor;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
-import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
 
 /**
  * Handler for the end of game processes
@@ -40,13 +39,13 @@ public class GameEndStage {
 
 	/**
 	 * Checks whether there is only 1 team standing, which is a win, and begins the end stage for that team with {@link
-	 * #declareWinningTeam(BedWarsTeam)}. If a winner is found, the {@link ProtectTheEgg#getGameStage()} will be set
+	 * #declareWinningTeam(PlayerBasedTeam)}. If a winner is found, the {@link ProtectTheEgg#getGameStage()} will be set
 	 * to {@link GameStage#ENDING} to indicate this.
 	 */
 	public static void checkForWinningTeam() {
-		BedWarsTeam lastTeamChecked = null;
+		PlayerBasedTeam lastTeamChecked = null;
 		for (Player player : DeathTracker.getLivingPlayers()) {
-			BedWarsTeam team = TeamHandler.getTeam(player);
+			PlayerBasedTeam team = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
 			if (lastTeamChecked != null && lastTeamChecked != team) {
 				return; // There's more than 1 team left
 			}
@@ -66,11 +65,11 @@ public class GameEndStage {
 	 *
 	 * @param team who has won
 	 */
-	public static void declareWinningTeam(BedWarsTeam team) {
+	public static void declareWinningTeam(PlayerBasedTeam team) {
 		sendWinnerMessagesAndScoreboard(team);
 
 		FireworkEffect fireworkEffect = FireworkEffect.builder()
-				.with(Type.BALL).withColor(team.getArmourColor()).trail(true).build();
+				.with(Type.BALL).withColor(team.getArmorColor()).trail(true).build();
 		startFireworks(fireworkEffect, team.getOnlineMembers());
 
 		startSelfDestruct();
@@ -100,7 +99,7 @@ public class GameEndStage {
 	 *
 	 * @param team who has won
 	 */
-	private static void sendWinnerMessagesAndScoreboard(BedWarsTeam team) {
+	private static void sendWinnerMessagesAndScoreboard(PlayerBasedTeam team) {
 		ChatColor color = team.getChatColor();
 		String boldColor = color + ChatColor.BOLD.toString();
 
@@ -123,9 +122,15 @@ public class GameEndStage {
 		endingScoreboard.addLine(new ConstantElement(color + "has Won!"));
 		endingScoreboard.addBlankLine();
 
-		List<Player> onlinePlayers = team.getOnlineMembers();
-		for (int i = 0; i < onlinePlayers.size() && i < 9; i++) {
-			endingScoreboard.addLine(new ConstantElement(color + onlinePlayers.get(i).getName()));
+		Set<Player> onlinePlayers = team.getOnlineMembers();
+		int iterations = 0; // Can't use an incremental for loop with a set
+		for (Player player : onlinePlayers) {
+			if (iterations < 9) {
+				endingScoreboard.addLine(new ConstantElement(color + player.getName()));
+				iterations++;
+			} else {
+				break;
+			}
 		}
 
 		endingScoreboard.addBlankLine();

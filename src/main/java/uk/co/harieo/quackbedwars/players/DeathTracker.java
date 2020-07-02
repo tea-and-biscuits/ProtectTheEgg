@@ -21,13 +21,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.ChatColor;
 import uk.co.harieo.minigames.games.GameStage;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.stages.GameEndStage;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
-import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
-import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
+/**
+ * A listener which tracks all damage being dealt in the game then handles the process of a player dying to that damage
+ */
 public class DeathTracker implements Listener {
 
 	private static final Set<UUID> livingPlayers = new HashSet<>();
@@ -39,6 +40,8 @@ public class DeathTracker implements Listener {
 			Entity entityVictim = event.getEntity();
 			if (entityVictim instanceof Player) {
 				Player victim = (Player) entityVictim;
+
+				// If the victim isn't a spectator and this event will kill them
 				if (!spectators.contains(victim.getUniqueId()) && willKill(event, victim)) {
 					event.setCancelled(true);
 
@@ -49,9 +52,9 @@ public class DeathTracker implements Listener {
 					}
 
 					// Respawn the player and update their statistics
-					BedWarsTeam victimTeam = TeamHandler.getTeam(victim);
+					Team victimTeam = ProtectTheEgg.getInstance().getTeamHandler().getTeam(victim);
 					if (victimTeam != null) {
-						Location location = TeamSpawnHandler.getSpawn(victimTeam);
+						Location location = victimTeam.getSpawns().getNextSpawn();
 						if (location != null) {
 							victim.teleport(location);
 						}
@@ -84,13 +87,13 @@ public class DeathTracker implements Listener {
 			Entity entityDamager = event.getDamager();
 			if (entityVictim instanceof Player) {
 				Player victim = (Player) entityVictim;
-				if (willKill(event, victim)) { // If they're going to die
+				if (willKill(event, victim)) { // If the victim is going to die from this event
 					if (entityDamager instanceof Player) {
 						Player damager = (Player) entityDamager;
 						Statistic.KILLS.addValue(damager, 1);
 
 						ChatColor color;
-						BedWarsTeam damagerTeam = TeamHandler.getTeam(damager);
+						Team damagerTeam = ProtectTheEgg.getInstance().getTeamHandler().getTeam(damager);
 						if (damagerTeam != null) {
 							color = damagerTeam.getChatColor();
 						} else {
@@ -110,16 +113,26 @@ public class DeathTracker implements Listener {
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
-		BedWarsTeam team = TeamHandler.getTeam(player);
+		Team team = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
 		if (team != null) {
-			player.teleport(Objects.requireNonNull(TeamSpawnHandler.getSpawn(team)));
+			player.teleport(Objects.requireNonNull(team.getSpawns().getNextSpawn()));
 		}
 	}
 
+	/**
+	 * Checks whether an {@link EntityDamageEvent} contains enough damage to kill a {@link LivingEntity}
+	 *
+	 * @param event which represents the damage being dealt
+	 * @param victim who is taking the damage
+	 * @return whether the event will kill the person based on its damage
+	 */
 	private boolean willKill(EntityDamageEvent event, LivingEntity victim) {
 		return event.getFinalDamage() >= victim.getHealth();
 	}
 
+	/**
+	 * @return whether this game is in the stage {@link GameStage#IN_GAME}
+	 */
 	private boolean isInGame() {
 		return ProtectTheEgg.getInstance().getGameStage() == GameStage.IN_GAME;
 	}

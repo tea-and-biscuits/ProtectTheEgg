@@ -12,6 +12,8 @@ import uk.co.harieo.minigames.events.MinigameStartEvent;
 import uk.co.harieo.minigames.games.GameStage;
 import uk.co.harieo.minigames.maps.MapImpl;
 import uk.co.harieo.minigames.scoreboards.GameBoard;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
+import uk.co.harieo.minigames.teams.TeamHandler;
 import uk.co.harieo.minigames.timing.GameTimer;
 import uk.co.harieo.minigames.timing.Timer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
@@ -22,10 +24,8 @@ import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.PlayerEffects;
 import uk.co.harieo.quackbedwars.scoreboard.BedWarsProcessor;
 import uk.co.harieo.quackbedwars.scoreboard.TeamStatusElement;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
-import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
-import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
 public class GameStartStage {
 
@@ -71,7 +71,8 @@ public class GameStartStage {
 		}
 
 		// Activate team assets if the team has at least 1 member playing in it
-		for (BedWarsTeam team : BedWarsTeam.values()) {
+		for (BedWarsTeamData teamData : BedWarsTeamData.values()) {
+			PlayerBasedTeam team = teamData.getTeam();
 			if (team.getOnlineMembers().size() > 0) {
 				// Activate team's spawner
 				TeamSpawner spawner = TeamSpawner.getCachedSpawner(team);
@@ -135,16 +136,17 @@ public class GameStartStage {
 	}
 
 	/**
-	 * Assigns a {@link BedWarsTeam} to a player if they don't already have one then teleports them to that team's
+	 * Assigns a {@link BedWarsTeamData} to a player if they don't already have one then teleports them to that team's
 	 * spawn
 	 *
 	 * @param plugin which is starting the game
 	 * @param player to assign a team to
 	 */
 	private static void assignPlayerTeam(ProtectTheEgg plugin, Player player) {
-		BedWarsTeam team = TeamHandler.getTeam(player);
+		TeamHandler<PlayerBasedTeam> teamHandler = ProtectTheEgg.getInstance().getTeamHandler();
+		PlayerBasedTeam team = teamHandler.getTeam(player);
 		if (team == null) {
-			team = TeamHandler.assignTeam(player);
+			team = teamHandler.assignTeam(player);
 			if (team == null) {
 				player.kickPlayer(ChatColor.RED + "An error has occurred assigning you a team!");
 				plugin.getLogger().severe("Failed to assign " + player.getName() + " a team");
@@ -157,7 +159,7 @@ public class GameStartStage {
 		}
 
 		Location blockSpawn = Objects
-				.requireNonNull(TeamSpawnHandler.getSpawn(team), "No spawn available for " + team.getName() + " team");
+				.requireNonNull(team.getSpawns().getNextSpawn(), "No spawn available for " + team.getName() + " team");
 		Location centeredSpawn = new Location(blockSpawn.getWorld(), blockSpawn.getX() + 0.5, blockSpawn.getY(),
 				blockSpawn.getZ() + 0.5);
 		PregameCages.createCage(centeredSpawn);
@@ -168,10 +170,11 @@ public class GameStartStage {
 	private static void formatScoreboard() {
 		mainScoreboard.addBlankLine();
 		int index = 0;
-		for (BedWarsTeam team : BedWarsTeam.values()) {
+		for (BedWarsTeamData teamData : BedWarsTeamData.values()) {
+			PlayerBasedTeam team = teamData.getTeam();
 			if (index < 13) { // Done so that it only increments on a successful line
-				if (team.isTeamActive() && team.getMembers().size() > 0) {
-					mainScoreboard.addLine(new TeamStatusElement(team));
+				if (teamData.isTeamActive() && team.getMembers().size() > 0) {
+					mainScoreboard.addLine(new TeamStatusElement(teamData));
 					index++;
 				}
 			} else {

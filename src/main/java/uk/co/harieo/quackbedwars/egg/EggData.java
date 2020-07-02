@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 
 public class EggData {
@@ -19,7 +20,7 @@ public class EggData {
 	private static final Map<Block, EggData> eggDataCache = new HashMap<>();
 
 	private final Block eggBlock;
-	private final BedWarsTeam team;
+	private final PlayerBasedTeam team;
 	private boolean intact = true;
 
 	/**
@@ -28,7 +29,7 @@ public class EggData {
 	 * @param block to put the egg at
 	 * @param team the team which this egg belongs to
 	 */
-	public EggData(Block block, BedWarsTeam team) {
+	public EggData(Block block, PlayerBasedTeam team) {
 		this.eggBlock = block;
 		this.team = team;
 		eggDataCache.put(block, this);
@@ -60,7 +61,7 @@ public class EggData {
 	/**
 	 * @return the team which owns this egg
 	 */
-	public BedWarsTeam getTeam() {
+	public PlayerBasedTeam getTeam() {
 		return team;
 	}
 
@@ -68,7 +69,18 @@ public class EggData {
 	 * Sets the material of the {@link #getEggBlock()} to a dragon egg and the block underneath to bedrock
 	 */
 	public void setBlockMaterial() {
-		eggBlock.setType(Material.DRAGON_EGG);
+		setEggMaterial(Material.DRAGON_EGG);
+	}
+
+	/**
+	 * Sets the egg block as empty, removing any existing dragon egg
+	 */
+	public void removeEgg() {
+		setEggMaterial(Material.AIR);
+	}
+
+	private void setEggMaterial(Material material) {
+		eggBlock.setType(material);
 	}
 
 	/**
@@ -83,7 +95,8 @@ public class EggData {
 		for (LocationPair pair : map.getLocationsByKey(EGG_KEY)) {
 			String teamName = pair.getValue();
 			try {
-				BedWarsTeam team = BedWarsTeam.valueOf(teamName);
+				BedWarsTeamData teamData = BedWarsTeamData.valueOf(teamName);
+				PlayerBasedTeam team = teamData.getTeam();
 				Block block = pair.getLocation().getBlock();
 
 				EggData eggData = new EggData(block, team);

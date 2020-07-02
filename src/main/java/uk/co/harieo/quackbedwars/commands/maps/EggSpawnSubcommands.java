@@ -6,15 +6,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.google.common.collect.Sets;
-import java.util.Arrays;
 import java.util.Set;
 import uk.co.harieo.minigames.commands.CommandUtils;
 import uk.co.harieo.minigames.commands.Subcommand;
 import uk.co.harieo.minigames.maps.LocationPair;
 import uk.co.harieo.minigames.maps.MapImpl;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.egg.EggData;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 
 public class EggSpawnSubcommands implements Subcommand {
@@ -53,7 +54,7 @@ public class EggSpawnSubcommands implements Subcommand {
 
 	/**
 	 * The 'setegg' sub-command to the maps command which allows a player to set their current location as an egg spawn
-	 * point for a {@link BedWarsTeam}
+	 * point for a {@link BedWarsTeamData}
 	 *
 	 * @param player who has issued the command
 	 * @param args which were supplied with the command
@@ -64,8 +65,8 @@ public class EggSpawnSubcommands implements Subcommand {
 					ChatColor.RED + "Insufficient Arguments. Expected: /maps setegg <team>"));
 		} else {
 			String teamName = CommandUtils.concatenateArguments(args, 1);
-			BedWarsTeam team = BedWarsTeam.getByName(teamName);
-			if (team == null) {
+			BedWarsTeamData teamData = BedWarsTeamData.getByName(teamName);
+			if (teamData == null) {
 				player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.RED + "Unknown team: " + teamName));
 			} else {
 				MapImpl map = MapImpl.get(player.getWorld());
@@ -78,8 +79,10 @@ public class EggSpawnSubcommands implements Subcommand {
 					}
 				}
 
+				PlayerBasedTeam team = teamData.getTeam();
+
 				Location location = player.getLocation();
-				map.addLocation(location, EggData.EGG_KEY, team.name());
+				map.addLocation(location, EggData.EGG_KEY, teamData.name());
 				TeamGameData.getGameData(team).setEggData(new EggData(location.getBlock(), team)); // Caches the location
 
 				player.sendMessage(ProtectTheEgg.formatMessage(
@@ -105,8 +108,8 @@ public class EggSpawnSubcommands implements Subcommand {
 				deletedOnce = true;
 
 				try {
-					BedWarsTeam team = BedWarsTeam.valueOf(pair.getValue());
-					TeamGameData.getGameData(team).setEggData(null); // Removes the location from the cache
+					BedWarsTeamData teamData = BedWarsTeamData.valueOf(pair.getValue());
+					TeamGameData.getGameData(teamData.getTeam()).setEggData(null); // Removes the location from the cache
 				} catch (IllegalArgumentException ignored) { }
 			}
 		}

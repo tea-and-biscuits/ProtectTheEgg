@@ -6,9 +6,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 import uk.co.harieo.quackbedwars.teams.menu.UpgradeCategory;
 
@@ -53,14 +54,15 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 	private PurchasableCurrencyUpgrade child;
 
 	/**
-	 * An upgrade which a {@link BedWarsTeam} can purchase to upgrade their individual currency spawner
+	 * An upgrade which a {@link BedWarsTeamData} can purchase to upgrade their individual currency spawner
 	 *
 	 * @param name of this upgrade
 	 * @param diamondCost which this upgrade costs
 	 * @param parent the parent upgrade, if applicable
 	 * @param newSpawnRates the spawn rates which this adds or increases upon purchase
 	 */
-	PurchasableCurrencyUpgrade(String name, int diamondCost, PurchasableCurrencyUpgrade parent, CurrencySpawnRate... newSpawnRates) {
+	PurchasableCurrencyUpgrade(String name, int diamondCost, PurchasableCurrencyUpgrade parent,
+			CurrencySpawnRate... newSpawnRates) {
 		this.name = name;
 		this.diamondCost = diamondCost;
 		this.parent = parent;
@@ -105,7 +107,7 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 	}
 
 	@Override
-	public boolean isUnlocked(BedWarsTeam team) {
+	public boolean isUnlocked(Team team) {
 		TeamGameData gameData = TeamGameData.getGameData(team);
 		CurrencyUpgrade currentUpgrade = gameData.getCurrencyUpgrade();
 		if (currentUpgrade == this) {
@@ -124,7 +126,7 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 	}
 
 	@Override
-	public boolean canUnlock(BedWarsTeam team) {
+	public boolean canUnlock(Team team) {
 		PurchasableCurrencyUpgrade parent = getParent();
 		if (parent != null) {
 			return parent.isUnlocked(team); // If the upgrade before this is unlocked, this one is available
@@ -134,7 +136,7 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 	}
 
 	@Override
-	public void activateUpgrade(BedWarsTeam team) {
+	public void activateUpgrade(Team team) {
 		TeamGameData.getGameData(team).setCurrencyUpgrade(this);
 	}
 

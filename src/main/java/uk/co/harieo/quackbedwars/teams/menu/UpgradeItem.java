@@ -9,18 +9,17 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import uk.co.harieo.minigames.menus.MenuItem;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.handlers.CurrencyHandler;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
-import uk.co.harieo.quackbedwars.teams.handlers.TeamHandler;
 import uk.co.harieo.quackbedwars.teams.upgrades.TeamUpgrade;
 
 public class UpgradeItem extends MenuItem {
 
-	private static final Set<BedWarsTeam> purchaseBuffer = new HashSet<>();
+	private static final Set<PlayerBasedTeam> purchaseBuffer = new HashSet<>();
 
-	private final BedWarsTeam team;
+	private final PlayerBasedTeam team;
 	private final TeamUpgrade upgrade;
 
 	/**
@@ -30,7 +29,7 @@ public class UpgradeItem extends MenuItem {
 	 * @param team which can purchase this upgrade
 	 * @param upgrade that can be purchased
 	 */
-	public UpgradeItem(BedWarsTeam team, TeamUpgrade upgrade) {
+	public UpgradeItem(PlayerBasedTeam team, TeamUpgrade upgrade) {
 		super(Material.YELLOW_STAINED_GLASS_PANE);
 		this.team = team;
 		this.upgrade = upgrade;
@@ -80,7 +79,7 @@ public class UpgradeItem extends MenuItem {
 	 * @param player who is attempting to purchase this upgrade
 	 */
 	private void onUpgrade(Player player) {
-		BedWarsTeam team = TeamHandler.getTeam(player);
+		PlayerBasedTeam team = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
 		if (purchaseBuffer.contains(team)) {
 			player.sendMessage(ProtectTheEgg
 					.formatMessage(ChatColor.RED + "Please wait while someone on your team purchases an upgrade..."));

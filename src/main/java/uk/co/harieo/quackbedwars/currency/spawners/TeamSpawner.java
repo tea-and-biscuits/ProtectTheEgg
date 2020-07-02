@@ -4,13 +4,14 @@ import org.bukkit.ChatColor;
 
 import java.util.*;
 import uk.co.harieo.minigames.holograms.Hologram;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 
 public class TeamSpawner implements CurrencySpawner {
 
-	private static final Map<BedWarsTeam, TeamSpawner> cache = new HashMap<>();
+	private static final Map<Team, TeamSpawner> cache = new HashMap<>();
 
 	private final String name;
 	private final TeamGameData gameData;
@@ -18,12 +19,12 @@ public class TeamSpawner implements CurrencySpawner {
 	private boolean active = false;
 
 	/**
-	 * An instance of {@link CurrencySpawner} which is specific to a {@link BedWarsTeam} and has its spawn rates based
+	 * An instance of {@link CurrencySpawner} which is specific to a {@link BedWarsTeamData} and has its spawn rates based
 	 * on {@link uk.co.harieo.quackbedwars.teams.upgrades.currency.CurrencyUpgrade}
 	 *
 	 * @param team which owns this spawner
 	 */
-	public TeamSpawner(BedWarsTeam team) {
+	public TeamSpawner(Team team) {
 		this.name = team.getChatColor() + ChatColor.BOLD.toString() + team.getName() + "'s Spawner";
 		this.gameData = TeamGameData.getGameData(Objects.requireNonNull(team));
 		cache.put(team, this);
@@ -64,7 +65,7 @@ public class TeamSpawner implements CurrencySpawner {
 	 * @param team to get the spawner for
 	 * @return the cached spawner or null if none are cached
 	 */
-	public static TeamSpawner getCachedSpawner(BedWarsTeam team) {
+	public static TeamSpawner getCachedSpawner(Team team) {
 		return cache.get(team);
 	}
 

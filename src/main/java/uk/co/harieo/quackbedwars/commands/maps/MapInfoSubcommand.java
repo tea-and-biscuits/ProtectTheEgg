@@ -8,9 +8,10 @@ import com.google.common.collect.Sets;
 import java.util.Set;
 import uk.co.harieo.minigames.commands.Subcommand;
 import uk.co.harieo.minigames.maps.MapImpl;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.handlers.CurrencySpawnHandler;
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
@@ -66,13 +67,14 @@ public class MapInfoSubcommand implements Subcommand {
 			isValid = false;
 		}
 
-		BedWarsTeam[] teams = BedWarsTeam.values();
+		BedWarsTeamData[] teams = BedWarsTeamData.values();
 
 		// Counts how many teams have a player spawn and an egg spawn
 		int teamsWithSpawns = 0;
 		int teamsWithEggs = 0;
-		for (BedWarsTeam team : teams) {
-			if (!TeamSpawnHandler.getSpawnLocations(team).isEmpty()) {
+		for (BedWarsTeamData teamData : teams) {
+			Team team = teamData.getTeam();
+			if (!team.getSpawns().isEmpty()) {
 				teamsWithSpawns++;
 			}
 

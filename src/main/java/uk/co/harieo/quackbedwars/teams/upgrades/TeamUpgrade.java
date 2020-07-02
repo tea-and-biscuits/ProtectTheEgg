@@ -1,6 +1,6 @@
 package uk.co.harieo.quackbedwars.teams.upgrades;
 
-import uk.co.harieo.quackbedwars.teams.BedWarsTeam;
+import uk.co.harieo.minigames.teams.Team;
 
 /**
  * An upgrade which a team can purchase with diamonds
@@ -28,7 +28,7 @@ public interface TeamUpgrade {
 	 * @param team to check
 	 * @return whether the specified team has unlocked this upgrade
 	 */
-	boolean isUnlocked(BedWarsTeam team);
+	boolean isUnlocked(Team team);
 
 	/**
 	 * Checks whether a team may unlock this upgrade
@@ -36,13 +36,13 @@ public interface TeamUpgrade {
 	 * @param team attempting to unlock this upgrade
 	 * @return whether the team may unlock this upgrade
 	 */
-	boolean canUnlock(BedWarsTeam team);
+	boolean canUnlock(Team team);
 
 	/**
 	 * Executes the upgrade upon it being purchased
 	 *
 	 * @param team who has purchased this upgrade
 	 */
-	void activateUpgrade(BedWarsTeam team);
+	void activateUpgrade(Team team);
 
 }
