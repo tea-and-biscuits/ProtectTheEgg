@@ -3,9 +3,6 @@ package uk.co.harieo.quackbedwars.shops;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
-import org.bukkit.entity.Villager.Type;
-
-import uk.co.harieo.minigames.menus.MenuFactory;
 
 public enum ShopType {
 

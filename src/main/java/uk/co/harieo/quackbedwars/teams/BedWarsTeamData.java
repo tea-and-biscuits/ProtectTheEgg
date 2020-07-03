@@ -103,6 +103,22 @@ public enum BedWarsTeamData {
 	}
 
 	/**
+	 * Retrieves an instance of this class by comparing {@link #getTeam()} with the specified team
+	 *
+	 * @param team to get the matching data for
+	 * @return the matching data or null if none was found
+	 */
+	public static BedWarsTeamData getByTeam(PlayerBasedTeam team) {
+		// The allTeams set is a collection of all the teams from their matching data enums. If the parameter team is
+		// not a part of this set, it is not from this data class.
+		if (allTeams.contains(team)) {
+			return getByPredicate(data -> data.getTeam().equals(team));
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * Retrieves the first instance of this class which matches the specified predicate
 	 *
 	 * @param teamPredicate to compare against known teams

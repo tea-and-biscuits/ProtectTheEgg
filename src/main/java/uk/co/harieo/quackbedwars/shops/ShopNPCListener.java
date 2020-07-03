@@ -12,12 +12,15 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 
+/**
+ * A listener which scans for interactions with a {@link Villager} on the assumption that it may be a shop NPC
+ */
 public class ShopNPCListener implements Listener {
 
 	@EventHandler
 	public void onNPCDamage(EntityDamageEvent event) {
 		if (event.getEntityType() == EntityType.VILLAGER) {
-			event.setCancelled(true);
+			event.setCancelled(true); // Prevent damage to all villagers
 		}
 	}
 
@@ -25,17 +28,18 @@ public class ShopNPCListener implements Listener {
 	public void onNPCInteract(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
 		Entity entity = event.getRightClicked();
-		if (entity instanceof Villager) {
-			event.setCancelled(true);
+		if (entity instanceof Villager) { // If the right clicked entity is a villager
+			event.setCancelled(true); // Prevent opening the villager trade menu
 
 			Villager villager = (Villager) entity;
 			ShopType type = ShopHandler.getShopType(villager);
-			if (type != null) {
+			if (type != null) { // If this villager represents a known shop menu
 				ShopMenu menu = type.getMenu();
-				if (menu != null) {
+				if (menu != null) { // And if the menu has been created
 					menu.getOrCreateMenu(player).showInventory();
 				} else {
-					player.sendMessage(ProtectTheEgg.formatMessage(ChatColor.RED + "This villager isn't open for trade!"));
+					player.sendMessage(
+							ProtectTheEgg.formatMessage(ChatColor.RED + "This villager isn't open for trade!"));
 				}
 			}
 		}

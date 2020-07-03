@@ -13,6 +13,12 @@ public class TeamStatusElement implements RenderableElement {
 	private final Team team;
 	private final String teamName;
 
+	/**
+	 * An element which shows whether a team's egg is in-tact or not and if not, it shows how many players are left
+	 * until the team is eliminated
+	 *
+	 * @param teamData to show the status of
+	 */
 	public TeamStatusElement(BedWarsTeamData teamData) {
 		this.team = teamData.getTeam();
 		this.teamName = team.getChatColor().toString() + teamData.getTeamChar() + ChatColor.WHITE + ": " + team.getName();

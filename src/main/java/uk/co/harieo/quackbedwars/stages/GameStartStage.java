@@ -64,11 +64,11 @@ public class GameStartStage {
 			DeathTracker.markAlive(player); // Mark the player as in the game
 		}
 
+		ProtectTheEgg.updateTabListProcessors(); // Update team prefixes in the tab list
+
 		// Scoreboard requires that all teams be assigned before formatting, which is in the loop above
 		formatScoreboard();
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			showScoreboard(player); // Show the scoreboard
-		}
+		Bukkit.getOnlinePlayers().forEach(GameStartStage::showScoreboard);
 
 		// Activate team assets if the team has at least 1 member playing in it
 		for (BedWarsTeamData teamData : BedWarsTeamData.values()) {
@@ -146,7 +146,16 @@ public class GameStartStage {
 		TeamHandler<PlayerBasedTeam> teamHandler = ProtectTheEgg.getInstance().getTeamHandler();
 		PlayerBasedTeam team = teamHandler.getTeam(player);
 		if (team == null) {
-			team = teamHandler.assignTeam(player);
+			// Attempt to assign an active and not full team
+			team = teamHandler.assignTeam(player, potentialTeam -> {
+				BedWarsTeamData teamData = BedWarsTeamData.getByTeam(potentialTeam);
+				if (teamData != null) {
+					return teamData.isTeamActive() && !teamData.isFull();
+				} else {
+					return false; // If it has no data, we can't use it
+				}
+			});
+
 			if (team == null) {
 				player.kickPlayer(ChatColor.RED + "An error has occurred assigning you a team!");
 				plugin.getLogger().severe("Failed to assign " + player.getName() + " a team");
@@ -167,6 +176,9 @@ public class GameStartStage {
 		PlayerEffects.giveOneTimeFallImmunity(player); // Prevent them taking fall damage when the cage is deleted
 	}
 
+	/**
+	 * Formats the scoreboard with the status of all active teams (using {@link TeamStatusElement}) and the IP
+	 */
 	private static void formatScoreboard() {
 		mainScoreboard.addBlankLine();
 		int index = 0;
@@ -192,6 +204,9 @@ public class GameStartStage {
 		mainScoreboard.render(ProtectTheEgg.getInstance(), player, 20);
 	}
 
+	/**
+	 * Updates the tab list factory of the in-game scoreboard
+	 */
 	public static void updateTabListHandler() {
 		mainScoreboard.getTabListFactory().injectAllPlayers();
 	}

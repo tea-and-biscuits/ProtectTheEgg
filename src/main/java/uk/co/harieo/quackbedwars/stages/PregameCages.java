@@ -7,6 +7,10 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A class which adds and removes blocks at given vectors from the point at which a player will be teleported to imprison
+ * them before the game starts
+ */
 public class PregameCages {
 
 	private static final Set<Vector> cageVectors = new HashSet<>();
@@ -25,20 +29,38 @@ public class PregameCages {
 		cageVectors.add(new Vector(0, 2, 0));
 	}
 
+	/**
+	 * Forms a cage around the specified location
+	 *
+	 * @param location the point at which a player will be teleported
+	 */
 	public static void createCage(Location location) {
 		for (Vector vector : cageVectors) {
-			Location clonedLocation = location.clone().add(vector);
-			clonedLocation.getBlock().setType(Material.GLASS);
+			addVectorThenSetType(location, vector, Material.GLASS);
 		}
 		centralCagePoints.add(location.clone());
 	}
 
+	/**
+	 * Removes all blocks around the specified location
+	 */
 	public static void deleteCages() {
 		for (Location cagePoint : centralCagePoints) {
 			for (Vector vector : cageVectors) {
-				cagePoint.clone().add(vector).getBlock().setType(Material.AIR);
+				addVectorThenSetType(cagePoint, vector, Material.AIR);
 			}
 		}
+	}
+
+	/**
+	 * Takes a location, clones it, adds a vector to it then sets the block at the new location to the specified material
+	 *
+	 * @param centralPoint to add the vector to
+	 * @param toAdd to be added to the central point
+	 * @param type to set the block to at the new location
+	 */
+	private static void addVectorThenSetType(Location centralPoint, Vector toAdd, Material type) {
+		centralPoint.clone().add(toAdd).getBlock().setType(type);
 	}
 
 }

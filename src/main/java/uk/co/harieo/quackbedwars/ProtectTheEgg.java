@@ -51,7 +51,6 @@ public class ProtectTheEgg extends DefaultMinigame {
 			ChatColor.GOLD + ChatColor.BOLD.toString() + "Protect the Egg", DisplaySlot.SIDEBAR);
 	private static ProtectTheEgg instance;
 
-	private GameStage stage = GameStage.STARTING;
 	private GameConfig config;
 	private LobbyTimer lobbyTimer;
 	private TeamHandler<PlayerBasedTeam> teamHandler;
@@ -61,6 +60,7 @@ public class ProtectTheEgg extends DefaultMinigame {
 	@Override
 	public void onEnable() {
 		instance = this;
+		setGameStage(GameStage.STARTING);
 
 		config = new GameConfig(this);
 		if (getGameWorldConfig().isLoaded()) {
@@ -81,6 +81,7 @@ public class ProtectTheEgg extends DefaultMinigame {
 
 		teamHandler = new TeamHandler<>(BedWarsTeamData.allTeams, getGameConfig().getPlayersPerTeam());
 
+		// Set the upgrade menu for all available TeamUpgrade instances
 		ShopMenu upgradesMenu = new ShopMenu(ShopType.UPGRADES, 1);
 		ShopType.UPGRADES.setMenu(upgradesMenu);
 		upgradesMenu.setStaticItem(0, PurchasableCurrencyUpgrade.getCategory());
@@ -88,7 +89,8 @@ public class ProtectTheEgg extends DefaultMinigame {
 
 		setupScoreboard();
 		registerListeners(new ConnectionListener(), new WorldProtectionListener(), new EggListener(),
-				new DeathTracker(), new ShopNPCListener(), new TrapListener(), new PlayerEffects(), new LobbyHotbarListener(this));
+				new DeathTracker(), new ShopNPCListener(), new TrapListener(), new PlayerEffects(),
+				new LobbyHotbarListener(this));
 		registerCommand(new MapCommand(), "map", "maps");
 		registerCommand(new ForceStartCommand(), "force", "forcestart");
 		registerCommand(new TeamSelectCommand(), "team");
@@ -116,11 +118,9 @@ public class ProtectTheEgg extends DefaultMinigame {
 		return maxPlayers / 2;
 	}
 
-	@Override
-	public GameStage getGameStage() {
-		return stage;
-	}
-
+	/**
+	 * Formats the lobby scoreboard based on whether this game is is in development mode or not
+	 */
 	private void setupScoreboard() {
 		lobbyScoreboard.addBlankLine();
 		lobbyScoreboard.addLine(new ConstantElement(ChatColor.GREEN + ChatColor.BOLD.toString() + "Players"));
@@ -141,38 +141,63 @@ public class ProtectTheEgg extends DefaultMinigame {
 		lobbyScoreboard.getTabListFactory().injectProcessor(BedWarsProcessor.INSTANCE);
 	}
 
+	/**
+	 * Shows the lobby scoreboard to the specified player, refreshing once every 20 ticks
+	 *
+	 * @param player to show the scoreboard to
+	 */
 	public void setLobbyScoreboard(Player player) {
 		lobbyScoreboard.render(this, player, 20);
 	}
 
+	/**
+	 * @return the parsed configurable settings for this game
+	 */
 	public GameConfig getGameConfig() {
 		return config;
 	}
 
+	/**
+	 * @return the loaded configuration for both the lobby and game world
+	 */
 	public GameWorldConfig getGameWorldConfig() {
 		return getGameConfig().getGameWorldConfig();
 	}
 
-	public void setGameStage(GameStage gameStage) {
-		this.stage = gameStage;
-	}
-
+	/**
+	 * @return the timer which counts down to the {@link GameStartStage}
+	 */
 	public LobbyTimer getLobbyTimer() {
 		return lobbyTimer;
 	}
 
+	/**
+	 * @return the team handler with all teams for this game loaded into it ({@link BedWarsTeamData#allTeams})
+	 */
 	public TeamHandler<PlayerBasedTeam> getTeamHandler() {
 		return teamHandler;
 	}
 
+	/**
+	 * @return the enabled instance of this class
+	 */
 	public static ProtectTheEgg getInstance() {
 		return instance;
 	}
 
+	/**
+	 * Takes a message and adds the game's prefix
+	 *
+	 * @param message to add a prefix to
+	 * @return the formatted message
+	 */
 	public static String formatMessage(String message) {
 		return PREFIX + message;
 	}
 
+	/**
+	 * Updates all tab list factories in the 3 game stages (lobby, in-game and end-game scoreboards)
+	 */
 	public static void updateTabListProcessors() {
 		lobbyScoreboard.getTabListFactory().injectAllPlayers();
 		GameStartStage.updateTabListHandler();

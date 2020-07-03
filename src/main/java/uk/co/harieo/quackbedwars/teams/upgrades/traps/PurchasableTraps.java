@@ -98,6 +98,9 @@ public enum PurchasableTraps implements TeamUpgrade {
 		trigger.accept(player);
 	}
 
+	/**
+	 * @return the category which holds all upgrades from this class
+	 */
 	public static UpgradeCategory getCategory() {
 		return category;
 	}

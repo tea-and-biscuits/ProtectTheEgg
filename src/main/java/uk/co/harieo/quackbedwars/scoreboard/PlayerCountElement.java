@@ -5,6 +5,9 @@ import org.bukkit.entity.Player;
 
 import uk.co.harieo.minigames.scoreboards.elements.RenderableElement;
 
+/**
+ * An element which shows how many online players there are
+ */
 public class PlayerCountElement implements RenderableElement {
 
 	@Override

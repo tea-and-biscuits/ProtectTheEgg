@@ -29,7 +29,7 @@ public class LobbyHotbarListener implements Listener {
 	}
 
 	static {
-		MenuItem teamChangeItem = new MenuItem(Material.GREEN_WOOL);
+		MenuItem teamChangeItem = new MenuItem(Material.YELLOW_WOOL);
 		teamChangeItem.setName(ChatColor.GREEN + ChatColor.BOLD.toString() + "Change Team");
 		teamChangeItem.setLore(Collections.singletonList(ChatColor.GRAY + "Right Click to Change Teams"));
 		teamChangeItem.setOnClick(clicker -> TeamChangeMenu.INSTANCE.getOrCreateMenu(clicker).showInventory());

@@ -1,6 +1,5 @@
 package uk.co.harieo.quackbedwars.shops.config;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -23,6 +22,12 @@ public class ItemsConfig {
 
 	private List<ShopCategory> categories;
 
+	/**
+	 * A handler for the items.yml configuration file which parses all the stated categories of items, adding them
+	 * to their respective handlers, primarily {@link ShopCategory} and {@link ShopItem}, as they become available
+	 *
+	 * @param plugin which the configuration file belongs to
+	 */
 	public ItemsConfig(JavaPlugin plugin) {
 		try {
 			FileConfiguration config = GameConfig.getConfiguration(plugin, "items.yml");
@@ -43,6 +48,9 @@ public class ItemsConfig {
 		}
 	}
 
+	/**
+	 * @return a list of all parsed categories in the order they were listed in the configuration file
+	 */
 	public List<ShopCategory> getCategories() {
 		return categories;
 	}

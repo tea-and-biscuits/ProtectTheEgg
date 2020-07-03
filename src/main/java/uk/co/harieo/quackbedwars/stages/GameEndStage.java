@@ -89,6 +89,9 @@ public class GameEndStage {
 		startSelfDestruct();
 	}
 
+	/**
+	 * Updates the tab list factory for the end of game scoreboard
+	 */
 	public static void updateTabListHandler() {
 		endingScoreboard.getTabListFactory().injectAllPlayers();
 	}

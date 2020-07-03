@@ -42,7 +42,7 @@ public class TeamChangeMenu extends MenuFactory {
 				});
 
 				setItem(player, index, item);
-				index++;
+				index++; // Only increments if an item was actually added
 			}
 		}
 	}

@@ -23,44 +23,63 @@ public class ShopItem extends MenuItem {
 	private final ItemStack purchasableItem;
 	private final CurrencyCost purchaseCost;
 
+	/**
+	 * A {@link MenuItem} which shows an item that can be purchased and the price it can be purchased for. If the item
+	 * is clicked, this class will attempt to sell the item to the player.
+	 *
+	 * @param purchasableItem which can be purchased by the player
+	 * @param cost the amount this item costs
+	 */
 	public ShopItem(ItemStack purchasableItem, CurrencyCost cost) {
 		super(purchasableItem);
 		this.purchasableItem = purchasableItem;
 		this.purchaseCost = cost;
-
-		setOnClick(player -> {
-			if (!purchaseBuffer.contains(player)) {
-				purchaseBuffer.add(player); // Add to buffer while we check they have the currency needed
-				for (Entry<Currency, Integer> costEntry : purchaseCost.getAllCosts().entrySet()) {
-					Currency currency = costEntry.getKey();
-					int amount = costEntry.getValue();
-					if (!CurrencyHandler.hasAmountOfCurrency(player, currency, amount)) {
-						player.sendMessage(ProtectTheEgg.formatMessage(
-								ChatColor.RED + "You don't have enough " + currency.getName() + ", you need " + amount
-										+ " to buy that!"));
-						player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1F, 1F);
-						purchaseBuffer.remove(player); // Transaction failed but still complete
-						return;
-					} else {
-						CurrencyHandler.subtractCurrency(player, currency, amount);
-					}
-				}
-
-				player.getInventory().addItem(purchasableItem);
-				purchaseBuffer.remove(player); // Transaction complete, they can now buy the next item
-			} else {
-				player.sendMessage(ProtectTheEgg
-						.formatMessage(ChatColor.RED + "Please wait a moment before purchasing something else!"));
-			}
-		});
+		setOnClick(this::onPurchaseAttempt);
 	}
 
+	/**
+	 * @return the item which can be purchased
+	 */
 	public ItemStack getPurchasableItem() {
 		return purchasableItem;
 	}
 
+	/**
+	 * @return the cost of this item
+	 */
 	public CurrencyCost getPurchaseCost() {
 		return purchaseCost;
+	}
+
+	/**
+	 * Attempts to deduct the cost of the purchasable item from the player then gives the item to them in return
+	 *
+	 * @param player who is attempting to purchase this item
+	 */
+	private void onPurchaseAttempt(Player player) {
+		if (purchaseBuffer.contains(player)) { // Prevents any possible simultaneous purchases
+			player.sendMessage(ProtectTheEgg
+					.formatMessage(ChatColor.RED + "Please wait a moment before purchasing something else!"));
+		} else {
+			purchaseBuffer.add(player); // Add to buffer while we check they have the currency needed
+			for (Entry<Currency, Integer> costEntry : purchaseCost.getAllCosts().entrySet()) {
+				Currency currency = costEntry.getKey();
+				int amount = costEntry.getValue();
+				if (!CurrencyHandler.hasAmountOfCurrency(player, currency, amount)) {
+					player.sendMessage(ProtectTheEgg.formatMessage(
+							ChatColor.RED + "You don't have enough " + currency.getName() + ", you need " + amount
+									+ " to buy that!"));
+					player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1F, 1F);
+					purchaseBuffer.remove(player); // Transaction failed but still complete
+					return;
+				} else {
+					CurrencyHandler.subtractCurrency(player, currency, amount);
+				}
+			}
+
+			player.getInventory().addItem(purchasableItem);
+			purchaseBuffer.remove(player); // Transaction complete, they can now buy the next item
+		}
 	}
 
 	/**
@@ -77,19 +96,14 @@ public class ShopItem extends MenuItem {
 		Logger logger = ProtectTheEgg.getInstance().getLogger();
 		String sectionName = section.getName();
 
-		ItemStack purchasableItem = ItemsConfig.parseItem(section);
+		ItemStack purchasableItem = ItemsConfig.parseItem(section); // Get the item which can be purchased
 		if (purchasableItem != null) {
 			ConfigurationSection costSection = section.getConfigurationSection("cost");
 			if (costSection != null) {
 				CurrencyCost cost = new CurrencyCost();
 
-				StringBuilder costStringBuilder = new StringBuilder();
-				costStringBuilder.append(ChatColor.GRAY);
-				costStringBuilder.append("Cost: ");
-
+				// Parse the cost section for all the individual currency costs
 				Set<String> currencyKeys = costSection.getKeys(false);
-				int iterations = 0;
-
 				for (String currencyKey : currencyKeys) {
 					Currency currency;
 					try {
@@ -103,17 +117,6 @@ public class ShopItem extends MenuItem {
 
 					int amount = costSection.getInt(currencyKey);
 					cost.setCost(currency, amount);
-
-					ChatColor color = currency.getColor();
-					costStringBuilder.append(color);
-					costStringBuilder.append(amount);
-					costStringBuilder.append(" ");
-					costStringBuilder.append(currency.getName());
-					if (iterations + 1 < currencyKeys.size()) { // If there is something after this
-						costStringBuilder.append(", ");
-					}
-
-					iterations++;
 				}
 
 				// Appends the cost string onto the current item's lore
@@ -124,8 +127,9 @@ public class ShopItem extends MenuItem {
 					if (currentLore != null) {
 						loreToEdit.addAll(currentLore);
 					}
+
 					loreToEdit.add("");
-					loreToEdit.add(costStringBuilder.toString());
+					loreToEdit.add(convertCostToString(cost));
 					meta.setLore(loreToEdit);
 					purchasableItem.setItemMeta(meta);
 				}
@@ -139,6 +143,34 @@ public class ShopItem extends MenuItem {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Takes a {@link CurrencyCost} then converts it into a user-friendly String which shows the cost separated by commas
+	 *
+	 * @param totalCost the cost to be converted
+	 * @return the user-friendly representation of the cost
+	 */
+	private static String convertCostToString(CurrencyCost totalCost) {
+		StringBuilder builder = new StringBuilder(ChatColor.GRAY + "Cost: ");
+
+		Set<Entry<Currency, Integer>> entrySet = totalCost.getAllCosts().entrySet();
+		int iterations = 0;
+		for (Entry<Currency, Integer> currencyCost : entrySet) {
+			Currency currency = currencyCost.getKey();
+			int amount = currencyCost.getValue();
+
+			ChatColor color = currency.getColor();
+			builder.append(color);
+			builder.append(amount);
+			builder.append(" ");
+			builder.append(currency.getName());
+			if (iterations + 1 < entrySet.size()) { // If there is something after this
+				builder.append(", ");
+			}
+		}
+
+		return builder.toString().trim();
 	}
 
 }

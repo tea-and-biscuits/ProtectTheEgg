@@ -12,10 +12,13 @@ import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 
 public class BedWarsProcessor extends TabListProcessor {
 
-	public static final BedWarsProcessor INSTANCE = new BedWarsProcessor();
+	public static final BedWarsProcessor INSTANCE = new BedWarsProcessor(); // No reason for this to be made more than once
 
 	private final Map<PlayerBasedTeam, Affix> teamAffixMap = new HashMap<>();
 
+	/**
+	 * A processor which uses a team's coloured name as a prefix for that team's players in the tab list
+	 */
 	private BedWarsProcessor() {
 		for (BedWarsTeamData teamData : BedWarsTeamData.values()) {
 			PlayerBasedTeam team = teamData.getTeam();
