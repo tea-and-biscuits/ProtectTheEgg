@@ -24,7 +24,7 @@ public class TeamNameElement implements RenderableElement {
 	public String getText(Player player) {
 		PlayerBasedTeam team = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
 		return team == null ? "No Team"
-				: team.getChatColor() + (bold ? ChatColor.BOLD.toString() : "") + team.getName();
+				: team.getColour().getChatColor() + (bold ? ChatColor.BOLD.toString() : "") + team.getName();
 	}
 
 }

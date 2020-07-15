@@ -3,11 +3,14 @@ package uk.co.harieo.quackbedwars.currency.spawners;
 import org.bukkit.ChatColor;
 
 import java.util.*;
+import java.util.Map.Entry;
 import uk.co.harieo.minigames.holograms.Hologram;
 import uk.co.harieo.minigames.teams.Team;
+import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
+import uk.co.harieo.quackbedwars.teams.upgrades.currency.CurrencyUpgrade;
 
 public class TeamSpawner implements CurrencySpawner {
 
@@ -18,6 +21,9 @@ public class TeamSpawner implements CurrencySpawner {
 	private final Hologram hologram = new Hologram();
 	private boolean active = false;
 
+	private CurrencyUpgrade lastKnownUpgrade;
+	private Map<Currency, CurrencySpawnRate> spawnRateMap = new HashMap<>();
+
 	/**
 	 * An instance of {@link CurrencySpawner} which is specific to a {@link BedWarsTeamData} and has its spawn rates based
 	 * on {@link uk.co.harieo.quackbedwars.teams.upgrades.currency.CurrencyUpgrade}
@@ -25,8 +31,9 @@ public class TeamSpawner implements CurrencySpawner {
 	 * @param team which owns this spawner
 	 */
 	public TeamSpawner(Team team) {
-		this.name = team.getChatColor() + ChatColor.BOLD.toString() + team.getName() + "'s Spawner";
+		this.name = team.getColour().getChatColor() + ChatColor.BOLD.toString() + team.getName() + "'s Spawner";
 		this.gameData = TeamGameData.getGameData(Objects.requireNonNull(team));
+		updateSpawnRates(gameData.getCurrencyUpgrade());
 		cache.put(team, this);
 	}
 
@@ -37,7 +44,20 @@ public class TeamSpawner implements CurrencySpawner {
 
 	@Override
 	public Set<CurrencySpawnRate> getSpawnRates() {
-		return new HashSet<>(gameData.getCurrencyUpgrade().getChangedSpawnRates().values());
+		CurrencyUpgrade currentUpgrade = gameData.getCurrencyUpgrade();
+		if (!currentUpgrade.equals(lastKnownUpgrade)) {
+			lastKnownUpgrade = currentUpgrade;
+			updateSpawnRates(currentUpgrade);
+		}
+
+		return new HashSet<>(spawnRateMap.values());
+	}
+
+	private void updateSpawnRates(CurrencyUpgrade upgrade) {
+		spawnRateMap.clear();
+		for (Entry<Currency, CurrencySpawnRate> entry : upgrade.getChangedSpawnRates().entrySet()) {
+			spawnRateMap.put(entry.getKey(), new CurrencySpawnRate(entry.getValue()));
+		}
 	}
 
 	@Override

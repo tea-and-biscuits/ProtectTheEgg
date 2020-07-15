@@ -70,7 +70,7 @@ public class UpgradeItem extends MenuItem {
 					+ (cost != 1 ? "s" : "");
 		}
 
-		setLore(Arrays.asList(upgrade.getDescription(), "", lastLine));
+		setLore(Arrays.asList(ChatColor.GRAY + upgrade.getDescription(), "", lastLine));
 	}
 
 	/**

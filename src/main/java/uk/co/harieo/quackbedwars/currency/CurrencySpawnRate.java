@@ -20,6 +20,10 @@ public class CurrencySpawnRate {
 		this.amountPerSpawn = amountPerSpawn;
 	}
 
+	public CurrencySpawnRate(CurrencySpawnRate spawnRate) {
+		this(spawnRate.getCurrency(), spawnRate.getSecondsPerSpawn(), spawnRate.getAmountPerSpawn());
+	}
+
 	public Currency getCurrency() {
 		return currency;
 	}

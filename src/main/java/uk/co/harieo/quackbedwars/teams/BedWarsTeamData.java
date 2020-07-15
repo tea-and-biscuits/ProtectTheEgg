@@ -1,30 +1,27 @@
 package uk.co.harieo.quackbedwars.teams;
 
-import org.bukkit.Color;
-import org.bukkit.Material;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
-import net.md_5.bungee.api.ChatColor;
+import uk.co.harieo.minigames.teams.ColourGroup;
 import uk.co.harieo.minigames.teams.PlayerBasedTeam;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 
 public enum BedWarsTeamData {
 
-	GREEN('G', "Green", ChatColor.GREEN, Color.LIME, Material.GREEN_STAINED_GLASS),
-	DARK_GREEN('G', "Dark Green", ChatColor.DARK_GREEN, Color.GREEN, Material.GREEN_STAINED_GLASS),
-	YELLOW('Y', "Yellow", ChatColor.YELLOW, Color.YELLOW, Material.YELLOW_STAINED_GLASS),
-	RED('R', "Red", ChatColor.RED, Color.RED, Material.RED_STAINED_GLASS),
-	DARK_RED('R', "Dark Red", ChatColor.DARK_RED, Color.RED, Material.RED_STAINED_GLASS),
-	GRAY('G', "Grey", ChatColor.GRAY, Color.GRAY, Material.LIGHT_GRAY_STAINED_GLASS),
-	DARK_GRAY('G', "Dark Grey", ChatColor.DARK_GRAY, Color.GRAY, Material.GRAY_STAINED_GLASS),
-	AQUA('A', "Aqua", ChatColor.AQUA, Color.AQUA, Material.LIGHT_BLUE_STAINED_GLASS),
-	BLUE('B', "Blue", ChatColor.BLUE, Color.BLUE, Material.BLUE_STAINED_GLASS),
-	DARK_BLUE('B', "Dark Blue", ChatColor.DARK_BLUE, Color.BLUE, Material.BLUE_STAINED_GLASS),
-	PURPLE('P', "Purple", ChatColor.LIGHT_PURPLE, Color.PURPLE, Material.PURPLE_STAINED_GLASS),
-	DARK_PURPLE('P', "Dark Purple", ChatColor.DARK_PURPLE, Color.PURPLE, Material.PURPLE_STAINED_GLASS),
-	GOLD('O', "Orange", ChatColor.GOLD, Color.ORANGE, Material.ORANGE_STAINED_GLASS);
+	GREEN('G', "Green", ColourGroup.GREEN),
+	DARK_GREEN('G', "Dark Green", ColourGroup.DARK_GREEN),
+	YELLOW('Y', "Yellow", ColourGroup.YELLOW),
+	RED('R', "Red", ColourGroup.RED),
+	DARK_RED('R', "Dark Red", ColourGroup.DARK_RED),
+	GRAY('G', "Grey", ColourGroup.GRAY),
+	DARK_GRAY('G', "Dark Grey", ColourGroup.DARK_GRAY),
+	AQUA('A', "Aqua", ColourGroup.AQUA),
+	BLUE('B', "Blue", ColourGroup.BLUE),
+	DARK_BLUE('B', "Dark Blue", ColourGroup.DARK_BLUE),
+	PURPLE('P', "Purple", ColourGroup.LIGHT_PURPLE),
+	DARK_PURPLE('P', "Dark Purple", ColourGroup.DARK_PURPLE),
+	GOLD('O', "Orange", ColourGroup.GOLD);
 
 	public static final Set<PlayerBasedTeam> allTeams = new HashSet<>();
 
@@ -35,7 +32,6 @@ public enum BedWarsTeamData {
 	}
 
 	private final char teamChar;
-	private final Material cageMaterial;
 	private final PlayerBasedTeam team;
 
 	/**
@@ -44,14 +40,11 @@ public enum BedWarsTeamData {
 	 *
 	 * @param teamChar a character which can represent this team
 	 * @param name the name of the team, excluding the word 'team'
-	 * @param chatColor the colour which represents this team
-	 * @param armourColor the colour which represents this team for objects which use the wider range of colours
-	 * @param cageMaterial the default material that players in this team should be caged in pre-game
+	 * @param colourGroup the colour which represents this team
 	 */
-	BedWarsTeamData(char teamChar, String name, ChatColor chatColor, Color armourColor, Material cageMaterial) {
+	BedWarsTeamData(char teamChar, String name, ColourGroup colourGroup) {
 		this.teamChar = teamChar;
-		this.cageMaterial = cageMaterial;
-		this.team = new PlayerBasedTeam(name, chatColor, armourColor);
+		this.team = new PlayerBasedTeam(name, colourGroup);
 	}
 
 	/**
@@ -62,10 +55,10 @@ public enum BedWarsTeamData {
 	}
 
 	/**
-	 * @return the default cage material for this team
+	 * @return the colours which represent this team
 	 */
-	public Material getCageMaterial() {
-		return cageMaterial;
+	public ColourGroup getColourGroup() {
+		return team.getColour();
 	}
 
 	/**

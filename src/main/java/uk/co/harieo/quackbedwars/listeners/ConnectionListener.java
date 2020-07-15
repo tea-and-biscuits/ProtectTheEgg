@@ -10,12 +10,19 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffect;
 
 import uk.co.harieo.minigames.games.GameStage;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
+import uk.co.harieo.minigames.teams.Team;
+import uk.co.harieo.minigames.teams.TeamHandler;
 import uk.co.harieo.minigames.timing.LobbyTimer;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.egg.EggData;
+import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.stages.GameEndStage;
 import uk.co.harieo.quackbedwars.stages.GameStartStage;
+import uk.co.harieo.quackbedwars.teams.TeamGameData;
 
 public class ConnectionListener implements Listener {
 
@@ -46,6 +53,11 @@ public class ConnectionListener implements Listener {
 		player.setHealth(20);
 		player.getInventory().clear();
 
+		// Clear all lingering potion effects
+		for (PotionEffect effect : player.getActivePotionEffects()) {
+			player.removePotionEffect(effect.getType());
+		}
+
 		GameStage stage = plugin.getGameStage();
 		if (stage == GameStage.LOBBY || stage == GameStage.ERROR) {
 			event.setJoinMessage(ProtectTheEgg.formatMessage(
@@ -65,16 +77,18 @@ public class ConnectionListener implements Listener {
 							.formatMessage(ChatColor.GRAY + "You have joined mid-game so we've made you a spectator!"));
 			Bukkit.getOnlinePlayers().forEach(onlinePlayer -> onlinePlayer.hidePlayer(plugin, player));
 		}
+
+		ProtectTheEgg.updateTabListProcessors(); // Scoreboards are shown above, now they will be updated
 	}
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		ProtectTheEgg plugin = ProtectTheEgg.getInstance();
+		TeamHandler<PlayerBasedTeam> teamHandler = plugin.getTeamHandler();
 
 		event.setQuitMessage(ProtectTheEgg
 				.formatMessage(ChatColor.RED + player.getName() + ChatColor.GRAY + " has flown away from the nest!"));
-		ProtectTheEgg.getInstance().getTeamHandler().unsetTeam(player);
 
 		int playerCount = Bukkit.getOnlinePlayers().size() - 1;
 		GameStage stage = plugin.getGameStage();
@@ -85,7 +99,15 @@ public class ConnectionListener implements Listener {
 			Bukkit.getServer().shutdown();
 		} else if (stage == GameStage.IN_GAME) {
 			GameEndStage.checkForWinningTeam();
+			if (DeathTracker.isPlaying(player)) {
+				Team team = teamHandler.getTeam(player);
+				if (team != null) {
+					TeamGameData.getGameData(team).decrementPlayersAlive();
+				}
+			}
 		}
+
+		teamHandler.unsetTeam(player);
 	}
 
 	private void updateTimer(ProtectTheEgg plugin, int playerCount) {

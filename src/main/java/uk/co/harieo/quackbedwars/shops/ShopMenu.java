@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import uk.co.harieo.minigames.menus.MenuFactory;
 import uk.co.harieo.minigames.menus.MenuItem;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.shops.config.CloneableDynamicItem;
 
 public class ShopMenu extends MenuFactory {
 
@@ -44,10 +45,18 @@ public class ShopMenu extends MenuFactory {
 
 	@Override
 	public void setPlayerItems(Player player, int page) {
+		clearItems(player);
 		for (int i = 0; i < items.length; i++) {
 			MenuItem menuItem = items[i];
 			if (menuItem != null) {
-				setItem(player, i, menuItem);
+				MenuItem clonedItem;
+				if (menuItem instanceof CloneableDynamicItem) {
+					clonedItem = ((CloneableDynamicItem) menuItem).cloneForPlayer(player);
+				} else {
+					clonedItem = menuItem;
+				}
+
+				setItem(player, i, clonedItem);
 			}
 		}
 	}

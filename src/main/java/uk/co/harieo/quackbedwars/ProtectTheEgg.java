@@ -20,6 +20,7 @@ import uk.co.harieo.quackbedwars.commands.TeamSelectCommand;
 import uk.co.harieo.quackbedwars.config.GameConfig;
 import uk.co.harieo.quackbedwars.config.GameWorldConfig;
 import uk.co.harieo.quackbedwars.egg.EggListener;
+import uk.co.harieo.quackbedwars.listeners.ChatListener;
 import uk.co.harieo.quackbedwars.listeners.ConnectionListener;
 import uk.co.harieo.quackbedwars.listeners.LobbyHotbarListener;
 import uk.co.harieo.quackbedwars.listeners.WorldProtectionListener;
@@ -35,6 +36,7 @@ import uk.co.harieo.quackbedwars.stages.GameEndStage;
 import uk.co.harieo.quackbedwars.stages.GameStartStage;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.upgrades.currency.PurchasableCurrencyUpgrade;
+import uk.co.harieo.quackbedwars.teams.upgrades.effects.PurchasablePotionEffect;
 import uk.co.harieo.quackbedwars.teams.upgrades.traps.PurchasableTraps;
 import uk.co.harieo.quackbedwars.teams.upgrades.traps.TrapListener;
 
@@ -44,7 +46,7 @@ public class ProtectTheEgg extends DefaultMinigame {
 	public static final String PREFIX =
 			ChatColor.GOLD.toString() + ChatColor.BOLD + "Protect the Egg " + ChatColor.DARK_GRAY + ARROWS + " ";
 	public static final ConstantElement IP_ELEMENT = new ConstantElement(ChatColor.YELLOW + ChatColor.BOLD.toString()
-			+ "  Quacktopia" + ChatColor.GRAY + ".com");
+			+ "Quacktopia" + ChatColor.GRAY + ".com");
 	public static final Random RANDOM = new Random();
 
 	private static final GameBoard lobbyScoreboard = new GameBoard(
@@ -85,12 +87,13 @@ public class ProtectTheEgg extends DefaultMinigame {
 		ShopMenu upgradesMenu = new ShopMenu(ShopType.UPGRADES, 1);
 		ShopType.UPGRADES.setMenu(upgradesMenu);
 		upgradesMenu.setStaticItem(0, PurchasableCurrencyUpgrade.getCategory());
-		upgradesMenu.setStaticItem(1, PurchasableTraps.getCategory());
+		upgradesMenu.setStaticItem(1, PurchasablePotionEffect.getCategory());
+		upgradesMenu.setStaticItem(2, PurchasableTraps.getCategory());
 
 		setupScoreboard();
 		registerListeners(new ConnectionListener(), new WorldProtectionListener(), new EggListener(),
 				new DeathTracker(), new ShopNPCListener(), new TrapListener(), new PlayerEffects(),
-				new LobbyHotbarListener(this));
+				new LobbyHotbarListener(this), new ChatListener());
 		registerCommand(new MapCommand(), "map", "maps");
 		registerCommand(new ForceStartCommand(), "force", "forcestart");
 		registerCommand(new TeamSelectCommand(), "team");
@@ -138,7 +141,7 @@ public class ProtectTheEgg extends DefaultMinigame {
 		}
 		lobbyScoreboard.addBlankLine();
 		lobbyScoreboard.addLine(IP_ELEMENT);
-		lobbyScoreboard.getTabListFactory().injectProcessor(BedWarsProcessor.INSTANCE);
+		lobbyScoreboard.getTabListFactory().injectProcessor(new BedWarsProcessor());
 	}
 
 	/**

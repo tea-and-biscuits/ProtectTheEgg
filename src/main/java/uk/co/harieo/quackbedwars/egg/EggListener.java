@@ -4,8 +4,10 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -29,52 +31,47 @@ public class EggListener implements Listener {
 	@EventHandler
 	public void onEggBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
-		if (block.getType() == Material.DRAGON_EGG) {
+		if (isEgg(block)) {
+			Player player = event.getPlayer();
 			EggData eggData = EggData.getFromCachedBlock(block);
-			if (eggData != null) {
-				Player player = event.getPlayer();
 
-				PlayerBasedTeam eggOwnerTeam = eggData.getTeam();
-				PlayerBasedTeam destroyerTeam = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
-				if (eggOwnerTeam.equals(destroyerTeam)) { // Make sure this isn't friendly fire
-					event.setCancelled(true);
-					return;
-				} else {
-					eggData.setIntact(false);
-					event.setDropItems(false); // Prevents people picking up the egg
-				}
-
-				// Make a sound at the location to indicate the egg's destruction
-				Location blockLocation = block.getLocation();
-				World blockWorld = blockLocation.getWorld();
-				if (blockWorld != null) {
-					blockWorld.playSound(blockLocation, Sound.ENTITY_ENDER_DRAGON_GROWL, 0.5F, 0.5F);
-				}
-
-				// Send a red title to the egg's team
-				eggOwnerTeam.getMembers().stream()
-						.map(Bukkit::getPlayer)
-						.filter(Objects::nonNull)
-						.forEach(member ->
-								member.sendTitle(ChatColor.RED + "Egg Destroyed",
-										ChatColor.GRAY + "You can no longer respawn!",
-										20, 20 * 3, 20));
-
-				ChatColor color;
-				if (destroyerTeam != null) {
-					color = destroyerTeam.getChatColor();
-				} else {
-					color = ChatColor.GREEN;
-				}
-
-				Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
-						color + player.getName() + ChatColor.GRAY + " has destroyed the " +
-								eggOwnerTeam.getFormattedName() + "'s Egg"));
-				Statistic.EGGS_BROKEN.addValue(player, 1);
+			PlayerBasedTeam eggOwnerTeam = eggData.getTeam();
+			PlayerBasedTeam destroyerTeam = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
+			if (eggOwnerTeam.equals(destroyerTeam)) { // Make sure this isn't friendly fire
+				event.setCancelled(true);
+				return;
 			} else {
-				ProtectTheEgg.getInstance().getLogger()
-						.warning("A dragon egg was broken but it doesn't belong to any team");
+				eggData.setIntact(false);
+				event.setDropItems(false); // Prevents people picking up the egg
 			}
+
+			// Make a sound at the location to indicate the egg's destruction
+			Location blockLocation = block.getLocation();
+			World blockWorld = blockLocation.getWorld();
+			if (blockWorld != null) {
+				blockWorld.playSound(blockLocation, Sound.ENTITY_ENDER_DRAGON_GROWL, 0.5F, 0.5F);
+			}
+
+			// Send a red title to the egg's team
+			eggOwnerTeam.getMembers().stream()
+					.map(Bukkit::getPlayer)
+					.filter(Objects::nonNull)
+					.forEach(member ->
+							member.sendTitle(ChatColor.RED + "Egg Destroyed",
+									ChatColor.GRAY + "You can no longer respawn!",
+									20, 20 * 3, 20));
+
+			ChatColor color;
+			if (destroyerTeam != null) {
+				color = destroyerTeam.getColour().getChatColor().asBungee();
+			} else {
+				color = ChatColor.GREEN;
+			}
+
+			Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
+					color + player.getName() + ChatColor.GRAY + " has destroyed the " +
+							eggOwnerTeam.getFormattedName() + "'s Egg"));
+			Statistic.EGGS_BROKEN.addValue(player, 1);
 		}
 	}
 
@@ -88,12 +85,19 @@ public class EggListener implements Listener {
 	}
 
 	@EventHandler
+	public void onBlockExplode(BlockExplodeEvent event) {
+		if (isEgg(event.getBlock())) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler (priority = EventPriority.LOW)
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		PlayerBasedTeam team = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
 		if (team != null) {
 			EggData eggData = TeamGameData.getGameData(team).getEggData();
-			if (eggData != null && eggData.isIntact() && team.getOnlineMembers().size() <= 1) {
+			if (eggData.isIntact() && team.getOnlineMembers().size() <= 1) {
 				eggData.setIntact(false);
 				eggData.removeEgg();
 				Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
@@ -101,6 +105,26 @@ public class EggListener implements Listener {
 								+ " has abandoned the match!"));
 			}
 		}
+	}
+
+	/**
+	 * Checks whether the provided block is both a dragon egg and is cached by {@link EggData}
+	 *
+	 * @param block to be checked
+	 * @return whether the specified block is a cached dragon egg
+	 */
+	private boolean isEgg(Block block) {
+		if (block.getType() == Material.DRAGON_EGG) {
+			EggData eggData = EggData.getFromCachedBlock(block);
+			if (eggData != null) {
+				return true;
+			} else {
+				ProtectTheEgg.getInstance().getLogger()
+						.warning("A dragon egg was broken but it doesn't belong to any team");
+			}
+		}
+
+		return false;
 	}
 
 }

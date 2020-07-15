@@ -13,6 +13,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -21,7 +24,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.ChatColor;
 import uk.co.harieo.minigames.games.GameStage;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
 import uk.co.harieo.minigames.teams.Team;
+import uk.co.harieo.minigames.teams.TeamHandler;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.stages.GameEndStage;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
@@ -33,6 +38,7 @@ public class DeathTracker implements Listener {
 
 	private static final Set<UUID> livingPlayers = new HashSet<>();
 	private static final Set<UUID> spectators = new HashSet<>();
+	private static final Set<UUID> playing = new HashSet<>();
 
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent event) {
@@ -40,9 +46,11 @@ public class DeathTracker implements Listener {
 			Entity entityVictim = event.getEntity();
 			if (entityVictim instanceof Player) {
 				Player victim = (Player) entityVictim;
+				Team victimTeam = ProtectTheEgg.getInstance().getTeamHandler().getTeam(victim);
+				boolean isSpectator = spectators.contains(victim.getUniqueId());
 
 				// If the victim isn't a spectator and this event will kill them
-				if (!spectators.contains(victim.getUniqueId()) && willKill(event, victim)) {
+				if (!isSpectator && willKill(event, victim)) {
 					event.setCancelled(true);
 
 					// Broadcast death message (entity attack is dealt with by EntityDamageByEntityEvent handler)
@@ -52,28 +60,33 @@ public class DeathTracker implements Listener {
 					}
 
 					// Respawn the player and update their statistics
-					Team victimTeam = ProtectTheEgg.getInstance().getTeamHandler().getTeam(victim);
 					if (victimTeam != null) {
-						Location location = victimTeam.getSpawns().getNextSpawn();
-						if (location != null) {
-							victim.teleport(location);
-						}
+						teleportToNextSpawn(victim, victimTeam);
 
 						Statistic.DEATHS.addValue(victim, 1);
 						TeamGameData gameData = TeamGameData.getGameData(victimTeam);
 
 						if (gameData.isEggIntact()) {
-							delayedRespawn(victim, location);
+							delayedRespawn(victim, victimTeam);
 						} else {
 							setSpectator(victim);
 							victim.sendMessage(ProtectTheEgg.formatMessage(
 									ChatColor.RED + "You have died without an egg! " + ChatColor.GRAY
 											+ "We've put you into " + ChatColor.YELLOW + "Spectator Mode."));
 							gameData.decrementPlayersAlive(); // This player is dead forever
+							playing.remove(victim.getUniqueId());
 							GameEndStage.checkForWinningTeam();
 						}
 
 						victim.playSound(victim.getLocation(), Sound.ENTITY_GHAST_SCREAM, 0.5F, 0.5F);
+					}
+				} else if (isSpectator) {
+					event.setCancelled(true);
+
+					if (victimTeam != null) {
+						teleportToNextSpawn(victim, victimTeam);
+					} else {
+						victim.teleport(victim.getWorld().getSpawnLocation());
 					}
 				}
 			}
@@ -87,19 +100,27 @@ public class DeathTracker implements Listener {
 			Entity entityDamager = event.getDamager();
 			if (entityVictim instanceof Player) {
 				Player victim = (Player) entityVictim;
-				if (willKill(event, victim)) { // If the victim is going to die from this event
-					if (entityDamager instanceof Player) {
-						Player damager = (Player) entityDamager;
-						Statistic.KILLS.addValue(damager, 1);
+				if (entityDamager instanceof Player) {
+					Player damager = (Player) entityDamager;
 
-						ChatColor color;
-						Team damagerTeam = ProtectTheEgg.getInstance().getTeamHandler().getTeam(damager);
+					ChatColor color;
+					TeamHandler<PlayerBasedTeam> teamHandler = ProtectTheEgg.getInstance().getTeamHandler();
+					Team damagerTeam = teamHandler.getTeam(damager);
+					Team victimTeam = teamHandler.getTeam(victim);
+
+					if (damagerTeam != null && damagerTeam.equals(victimTeam)) { // If friendly fire
+						event.setCancelled(true);
+						return;
+					}
+
+					if (willKill(event, victim)) {
 						if (damagerTeam != null) {
-							color = damagerTeam.getChatColor();
+							color = damagerTeam.getColour().getChatColor().asBungee();
 						} else {
 							color = ChatColor.YELLOW;
 						}
 
+						Statistic.KILLS.addValue(damager, 1);
 						damager.playSound(damager.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5F, 0.5F);
 						Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
 								color + damager.getName() + ChatColor.GRAY + " has slain " + ChatColor.RED + victim
@@ -110,12 +131,32 @@ public class DeathTracker implements Listener {
 		}
 	}
 
+	private void teleportToNextSpawn(Player player, Team team) {
+		Location location = team.getSpawns().getNextSpawn();
+		if (location != null) {
+			player.teleport(location);
+		}
+	}
+
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
-		Player player = event.getEntity();
+		event.setDeathMessage(null); // This should be handled above
+		event.setKeepInventory(false);
+	}
+
+	@EventHandler
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		Player player = event.getPlayer();
 		Team team = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
 		if (team != null) {
-			player.teleport(Objects.requireNonNull(team.getSpawns().getNextSpawn()));
+			event.setRespawnLocation(Objects.requireNonNull(team.getSpawns().getNextSpawn()));
+		}
+	}
+
+	@EventHandler
+	public void onSpectatorTeleport(PlayerTeleportEvent event) {
+		if (event.getCause() == TeleportCause.SPECTATE) {
+			event.setCancelled(true);
 		}
 	}
 
@@ -141,18 +182,16 @@ public class DeathTracker implements Listener {
 	 * Sets a player into spectator mode then puts them back into survival mode 5 seconds later, a respawn delay
 	 *
 	 * @param player to be respawned
-	 * @param respawnLocation where to teleport them after the 5 seconds
+	 * @param team the player's non-null team
 	 */
-	private void delayedRespawn(Player player, Location respawnLocation) {
+	private void delayedRespawn(Player player, Team team) {
 		setSpectator(player);
 		int seconds = 5;
 		player.sendMessage(ProtectTheEgg.formatMessage(
 				ChatColor.YELLOW + "You are dead but your egg will resurrect you! " + ChatColor.GRAY + "Respawning in "
 						+ seconds + " seconds."));
 		Bukkit.getScheduler().runTaskLater(ProtectTheEgg.getInstance(), () -> {
-			if (respawnLocation != null) {
-				player.teleport(respawnLocation);
-			}
+			teleportToNextSpawn(player, team);
 			unsetSpectator(player);
 			player.setHealth(20);
 		}, seconds * 20);
@@ -198,7 +237,9 @@ public class DeathTracker implements Listener {
 	 * @param player to be marked as alive
 	 */
 	public static void markAlive(Player player) {
-		livingPlayers.add(player.getUniqueId());
+		UUID uuid = player.getUniqueId();
+		livingPlayers.add(uuid);
+		playing.add(uuid);
 	}
 
 	/**
@@ -209,6 +250,16 @@ public class DeathTracker implements Listener {
 	 */
 	public static boolean isAlive(Player player) {
 		return livingPlayers.contains(player.getUniqueId());
+	}
+
+	/**
+	 * Shows whether a player is still playing the game
+	 *
+	 * @param player to check
+	 * @return whether they are in-game as a temporary spectator or living player
+	 */
+	public static boolean isPlaying(Player player) {
+		return playing.contains(player.getUniqueId());
 	}
 
 	/**

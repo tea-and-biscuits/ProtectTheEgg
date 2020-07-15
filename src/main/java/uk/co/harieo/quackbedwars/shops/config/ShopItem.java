@@ -1,7 +1,9 @@
 package uk.co.harieo.quackbedwars.shops.config;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.Tag;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -11,12 +13,15 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 import uk.co.harieo.minigames.menus.MenuItem;
+import uk.co.harieo.minigames.teams.PlayerBasedTeam;
+import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencyCost;
 import uk.co.harieo.quackbedwars.currency.handlers.CurrencyHandler;
+import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 
-public class ShopItem extends MenuItem {
+public class ShopItem extends MenuItem implements CloneableDynamicItem {
 
 	private static final Set<Player> purchaseBuffer = new HashSet<>(); // Buffer prevents spam clicking to bypass cost
 
@@ -51,6 +56,22 @@ public class ShopItem extends MenuItem {
 		return purchaseCost;
 	}
 
+	@Override
+	public MenuItem cloneForPlayer(Player player) {
+		if (Tag.WOOL.isTagged(purchasableItem.getType())) {
+			PlayerBasedTeam team = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
+			if (team != null) {
+				MenuItem clone = new MenuItem(this);
+				ItemStack item = clone.getItem();
+				item.setType(team.getColour().getWoolType());
+				item.setAmount(purchasableItem.getAmount());
+				return clone;
+			}
+		}
+
+		return new MenuItem(this); // Not enough info to edit so return direct copy
+	}
+
 	/**
 	 * Attempts to deduct the cost of the purchasable item from the player then gives the item to them in return
 	 *
@@ -77,7 +98,7 @@ public class ShopItem extends MenuItem {
 				}
 			}
 
-			player.getInventory().addItem(purchasableItem);
+			player.getInventory().addItem(purchasableItem.clone());
 			purchaseBuffer.remove(player); // Transaction complete, they can now buy the next item
 		}
 	}
@@ -146,7 +167,8 @@ public class ShopItem extends MenuItem {
 	}
 
 	/**
-	 * Takes a {@link CurrencyCost} then converts it into a user-friendly String which shows the cost separated by commas
+	 * Takes a {@link CurrencyCost} then converts it into a user-friendly String which shows the cost separated by
+	 * commas
 	 *
 	 * @param totalCost the cost to be converted
 	 * @return the user-friendly representation of the cost

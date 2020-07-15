@@ -34,8 +34,6 @@ public class GameStartStage {
 	private static final GameTimer gameTimer = new GameTimer(ProtectTheEgg.getInstance(), 60 * 20);
 
 	static {
-		mainScoreboard.getTabListFactory().injectProcessor(BedWarsProcessor.INSTANCE);
-
 		gameTimer.setPrefix(ProtectTheEgg.PREFIX);
 		gameTimer.setOnTimerTick(GameStartStage::onTick);
 		gameTimer.setOnTimerEnd(end -> GameEndStage.forceDraw());
@@ -64,11 +62,10 @@ public class GameStartStage {
 			DeathTracker.markAlive(player); // Mark the player as in the game
 		}
 
-		ProtectTheEgg.updateTabListProcessors(); // Update team prefixes in the tab list
-
 		// Scoreboard requires that all teams be assigned before formatting, which is in the loop above
 		formatScoreboard();
 		Bukkit.getOnlinePlayers().forEach(GameStartStage::showScoreboard);
+		updateTabListHandler(); // Update team prefixes in the tab list
 
 		// Activate team assets if the team has at least 1 member playing in it
 		for (BedWarsTeamData teamData : BedWarsTeamData.values()) {
@@ -162,10 +159,12 @@ public class GameStartStage {
 				return; // Can't proceed to spawn if the team is null
 			} else {
 				player.sendMessage(ProtectTheEgg.formatMessage(
-						ChatColor.GRAY + "You have been auto-magically assigned to the " + team.getChatColor()
+						ChatColor.GRAY + "You have been auto-magically assigned to the " + team.getColour().getChatColor()
 								+ team.getName() + " Team"));
 			}
 		}
+
+		TeamGameData.getGameData(team).incrementPlayersAlive();
 
 		Location blockSpawn = Objects
 				.requireNonNull(team.getSpawns().getNextSpawn(), "No spawn available for " + team.getName() + " team");
@@ -195,6 +194,7 @@ public class GameStartStage {
 		}
 		mainScoreboard.addBlankLine();
 		mainScoreboard.addLine(ProtectTheEgg.IP_ELEMENT);
+		mainScoreboard.getTabListFactory().injectProcessor(new BedWarsProcessor());
 	}
 
 	/**

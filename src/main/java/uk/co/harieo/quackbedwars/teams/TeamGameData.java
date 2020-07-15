@@ -9,6 +9,7 @@ import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.egg.EggData;
 import uk.co.harieo.quackbedwars.teams.upgrades.currency.BaseCurrencyUpgrade;
 import uk.co.harieo.quackbedwars.teams.upgrades.currency.CurrencyUpgrade;
+import uk.co.harieo.quackbedwars.teams.upgrades.effects.PurchasablePotionEffect;
 import uk.co.harieo.quackbedwars.teams.upgrades.traps.PurchasableTraps;
 
 public class TeamGameData {
@@ -16,6 +17,7 @@ public class TeamGameData {
 	private static final Map<Team, TeamGameData> data = new HashMap<>();
 
 	private final Set<PurchasableTraps> purchasedTraps = new HashSet<>();
+	private final Set<PurchasablePotionEffect> purchasedPotionEffects = new HashSet<>();
 	private CurrencyUpgrade currencyUpgrade = BaseCurrencyUpgrade.INSTANCE;
 	private EggData eggData;
 	private int playersAlive = 0;
@@ -75,6 +77,31 @@ public class TeamGameData {
 	 */
 	public void removePurchasedTrap(PurchasableTraps trapUpgrade) {
 		purchasedTraps.remove(trapUpgrade);
+	}
+
+	/**
+	 * @return a set of all owned potion effects
+	 */
+	public Set<PurchasablePotionEffect> getPurchasedPotionEffects() {
+		return purchasedPotionEffects;
+	}
+
+	/**
+	 * Add a new potion effect to the set of purchased effects
+	 *
+	 * @param potionEffect to be added
+	 */
+	public void addPurchasedPotionEffect(PurchasablePotionEffect potionEffect) {
+		purchasedPotionEffects.add(potionEffect);
+	}
+
+	/**
+	 * Remove a potion effect from the set of purchased effects
+	 *
+	 * @param potionEffect to be removed
+	 */
+	public void removePurchasedPotionEffect(PurchasablePotionEffect potionEffect) {
+		purchasedPotionEffects.remove(potionEffect);
 	}
 
 	/**

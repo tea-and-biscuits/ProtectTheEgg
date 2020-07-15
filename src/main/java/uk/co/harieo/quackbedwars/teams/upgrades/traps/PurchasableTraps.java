@@ -22,8 +22,10 @@ public enum PurchasableTraps implements TeamUpgrade {
 			player -> player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 1))),
 	MINING_FATIGUE("Fatigue Trap", "Applies Mining Fatigue to anyone who comes near your egg", 4,
 			player -> player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 3, 3))),
-	LIGHTNING("Lightning Trap", "Strikes the power of zeus into anyone who comes near your egg", 2,
-			player -> player.getWorld().strikeLightning(player.getLocation()));
+	FIRE("Phoenix Trap", "Set your enemies on fire", 2,
+			player -> player.setFireTicks(20 * 5)),
+	PUMPKIN("Pumpkin Head Trap", "Scare your enemies with a pumpkin on their head", 3,
+			player -> player.getInventory().setHelmet(new ItemStack(Material.CARVED_PUMPKIN)));
 
 	private static final UpgradeCategory category;
 
@@ -105,4 +107,4 @@ public enum PurchasableTraps implements TeamUpgrade {
 		return category;
 	}
 
-}
+	}

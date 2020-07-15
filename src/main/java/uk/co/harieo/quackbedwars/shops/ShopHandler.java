@@ -58,11 +58,9 @@ public class ShopHandler {
 					Villager villager = (Villager) world.spawnEntity(centeredLocation, EntityType.VILLAGER);
 					villager.setProfession(type.getVillagerProfession());
 					villager.setAI(false);
+					villager.setCustomName(type.getColor() + type.getShopName());
+					villager.setCustomNameVisible(true);
 					shopNPCs.put(villager, type);
-
-					Hologram hologram = new Hologram().setLocation(centeredLocation.clone().add(0, 1, 0));
-					hologram.addLine(type.getColor() + type.getShopName());
-					hologram.updateLines();
 
 					successes++;
 				} else {

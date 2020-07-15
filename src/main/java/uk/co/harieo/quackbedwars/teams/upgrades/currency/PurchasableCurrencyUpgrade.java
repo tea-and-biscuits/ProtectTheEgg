@@ -5,7 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.*;
+import java.util.Map.Entry;
 import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
@@ -142,7 +144,7 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 
 	@Override
 	public Map<Currency, CurrencySpawnRate> getChangedSpawnRates() {
-		return spawnRates;
+		return ImmutableMap.copyOf(spawnRates);
 	}
 
 	/**

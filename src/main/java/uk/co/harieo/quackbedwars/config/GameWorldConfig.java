@@ -1,9 +1,6 @@
 package uk.co.harieo.quackbedwars.config;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -59,6 +56,7 @@ public class GameWorldConfig {
 			}
 
 			try {
+				world.setGameRule(GameRule.KEEP_INVENTORY, false);
 				gameWorld = MapImpl.parseWorld(world);
 				parseMap(gameWorld);
 			} catch (FileNotFoundException e) {

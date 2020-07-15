@@ -92,7 +92,7 @@ public class PlayerSpawnSubcommands implements Subcommand {
 			}
 
 			player.sendMessage(ProtectTheEgg.formatMessage(
-					ChatColor.GRAY + "Set current location to a " + team.getChatColor() + properTeamName + " "
+					ChatColor.GRAY + "Set current location to a " + team.getColour().getChatColor() + properTeamName + " "
 							+ ChatColor.GRAY
 							+ "spawn point!"));
 			team.getSpawns().addSpawn(location); // Caches the location so it doesn't need re-parsing

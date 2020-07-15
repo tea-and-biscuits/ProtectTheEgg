@@ -35,6 +35,7 @@ public class TeamSelectCommand implements CommandExecutor {
 					ProtectTheEgg.getInstance().getTeamHandler().setTeam(player, team);
 					sender.sendMessage(ProtectTheEgg
 							.formatMessage(ChatColor.GRAY + "You have joined the " + team.getFormattedName()));
+					ProtectTheEgg.updateTabListProcessors();
 				}
 			} else {
 				sender.sendMessage(

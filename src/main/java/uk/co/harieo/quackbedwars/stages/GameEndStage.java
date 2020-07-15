@@ -34,7 +34,7 @@ public class GameEndStage {
 			ChatColor.GOLD + ChatColor.BOLD.toString() + "Protect the Egg", DisplaySlot.SIDEBAR);
 
 	static {
-		endingScoreboard.getTabListFactory().injectProcessor(BedWarsProcessor.INSTANCE);
+		endingScoreboard.getTabListFactory().injectProcessor(new BedWarsProcessor());
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class GameEndStage {
 		sendWinnerMessagesAndScoreboard(team);
 
 		FireworkEffect fireworkEffect = FireworkEffect.builder()
-				.with(Type.BALL).withColor(team.getArmorColor()).trail(true).build();
+				.with(Type.BALL).withColor(team.getColour().getEquipmentColor()).trail(true).build();
 		startFireworks(fireworkEffect, team.getOnlineMembers());
 
 		startSelfDestruct();
@@ -103,7 +103,7 @@ public class GameEndStage {
 	 * @param team who has won
 	 */
 	private static void sendWinnerMessagesAndScoreboard(PlayerBasedTeam team) {
-		ChatColor color = team.getChatColor();
+		ChatColor color = team.getColour().getChatColor().asBungee();
 		String boldColor = color + ChatColor.BOLD.toString();
 
 		Bukkit.broadcastMessage("");
