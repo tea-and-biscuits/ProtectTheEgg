@@ -157,7 +157,7 @@ public class GameWorldConfig {
 		if (gameMap != null) {
 			World gameWorld = gameMap.getWorld();
 			if (gameWorld != null) {
-				Bukkit.unloadWorld(gameWorld, false);
+				Bukkit.unloadWorld(gameWorld, true);
 				try {
 					FileUtils.deleteDirectory(gameWorldDirectory);
 					plugin.getLogger().info("Deleted temporary game world successfully!");

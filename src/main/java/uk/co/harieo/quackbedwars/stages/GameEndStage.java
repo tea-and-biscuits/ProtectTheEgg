@@ -225,13 +225,17 @@ public class GameEndStage {
 	 * the end of the time.
 	 */
 	private static void startSelfDestruct() {
-		new Timer(ProtectTheEgg.getInstance(), 20 * 15)
+		ProtectTheEgg plugin = ProtectTheEgg.getInstance();
+		new Timer(plugin, 20 * 15)
 				.setOnTimerTick(tick -> {
 					if (tick == 10) {
 						MinigamesCore.sendAllPlayersToFallbackServer();
 					}
 				})
-				.setOnTimerEnd(end -> Bukkit.shutdown())
+				.setOnTimerEnd(end -> {
+					plugin.getGameWorldConfig().unloadTemporaryWorld(plugin);
+					Bukkit.shutdown();
+				})
 				.start();
 	}
 

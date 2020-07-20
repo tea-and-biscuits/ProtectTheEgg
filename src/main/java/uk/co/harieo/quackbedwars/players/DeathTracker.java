@@ -1,9 +1,6 @@
 package uk.co.harieo.quackbedwars.players;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -16,6 +13,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -66,6 +65,7 @@ public class DeathTracker implements Listener {
 						Statistic.DEATHS.addValue(victim, 1);
 						TeamGameData gameData = TeamGameData.getGameData(victimTeam);
 
+						spillInventory(victim);
 						if (gameData.isEggIntact()) {
 							delayedRespawn(victim, victimTeam);
 						} else {
@@ -141,7 +141,6 @@ public class DeathTracker implements Listener {
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		event.setDeathMessage(null); // This should be handled above
-		event.setKeepInventory(false);
 	}
 
 	@EventHandler
@@ -198,6 +197,23 @@ public class DeathTracker implements Listener {
 	}
 
 	/**
+	 * Drops all items in a player's inventory at their location then clears it
+	 *
+	 * @param player to spill the inventory of
+	 */
+	private void spillInventory(Player player) {
+		Location deathLocation = player.getLocation().clone(); // Makes sure it doesn't change
+		World world = player.getWorld();
+		PlayerInventory inventory = player.getInventory();
+		for (ItemStack item : inventory) {
+			if (item != null) {
+				world.dropItemNaturally(deathLocation, item);
+			}
+		}
+		inventory.clear();
+	}
+
+	/**
 	 * Makes a player hidden to all online players then sets them into spectator mode, removing them from the game
 	 *
 	 * @param player to set into spectator mode
@@ -240,6 +256,15 @@ public class DeathTracker implements Listener {
 		UUID uuid = player.getUniqueId();
 		livingPlayers.add(uuid);
 		playing.add(uuid);
+	}
+
+	/**
+	 * Removes this player from the list of living players
+	 *
+	 * @param player which is no longer alive
+	 */
+	public static void unmarkAlive(Player player) {
+		livingPlayers.remove(player.getUniqueId());
 	}
 
 	/**

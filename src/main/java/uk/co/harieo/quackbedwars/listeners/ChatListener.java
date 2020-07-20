@@ -37,9 +37,7 @@ public class ChatListener implements Listener {
 			if (message.startsWith("!")) {
 				Bukkit.broadcastMessage(ChatColor.YELLOW + "Shout ｜ " + formattedMessage.replaceFirst("!", ""));
 			} else {
-				conditionalBroadcast(
-						team.getColour().getChatColor() + "Team ｜ " + formattedMessage,
-						team::isMember);
+				conditionalBroadcast(formattedMessage, team::isMember);
 			}
 		} else {
 			conditionalBroadcast(ChatColor.GRAY + "[Spectator] " + player.getName() + " " + ChatColor.DARK_GRAY
@@ -58,7 +56,10 @@ public class ChatListener implements Listener {
 
 	private String formatPlayerMessage(Player player, String message) {
 		PlayerBasedTeam team = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
-		return (team != null ? team.getColour().getChatColor() + "[" + team.getName() + "] " : "") + ChatColor.WHITE + player.getName() + ChatColor.DARK_GRAY
+		return (team != null ? team.getColour().getChatColor()
+				+ "[" + team.getName() + "] "
+				: "")
+				+ ChatColor.WHITE + player.getName() + ChatColor.DARK_GRAY
 				+ " " + ProtectTheEgg.ARROWS + " " + ChatColor.WHITE + message;
 	}
 

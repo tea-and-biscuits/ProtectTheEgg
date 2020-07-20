@@ -15,6 +15,7 @@ import java.util.Objects;
 import net.md_5.bungee.api.ChatColor;
 import uk.co.harieo.minigames.teams.PlayerBasedTeam;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.Statistic;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
 
@@ -103,6 +104,10 @@ public class EggListener implements Listener {
 				Bukkit.broadcastMessage(ProtectTheEgg.formatMessage(
 						ChatColor.GRAY + "The " + team.getFormattedName() + ChatColor.GRAY
 								+ " has abandoned the match!"));
+
+				if (DeathTracker.isAlive(player)) {
+					DeathTracker.unmarkAlive(player);
+				}
 			}
 		}
 	}
