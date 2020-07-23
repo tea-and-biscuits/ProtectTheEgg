@@ -42,13 +42,22 @@ public class PregameCages {
 	}
 
 	/**
-	 * Removes all blocks around the specified location
+	 * Removes all blocks around the specified location matching the cage vectors
+	 *
+	 * @param centralPoint where the cage is centred
+	 */
+	public static void deleteCage(Location centralPoint) {
+		for (Vector vector : cageVectors) {
+			addVectorThenSetType(centralPoint, vector, Material.AIR);
+		}
+	}
+
+	/**
+	 * Calls {@link #deleteCage(Location)} on all cached cages
 	 */
 	public static void deleteCages() {
 		for (Location cagePoint : centralCagePoints) {
-			for (Vector vector : cageVectors) {
-				addVectorThenSetType(cagePoint, vector, Material.AIR);
-			}
+			deleteCage(cagePoint);
 		}
 	}
 

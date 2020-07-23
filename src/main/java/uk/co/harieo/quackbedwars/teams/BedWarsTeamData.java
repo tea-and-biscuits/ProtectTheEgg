@@ -73,8 +73,7 @@ public enum BedWarsTeamData {
 	 * file) and whether this team has at least 1 spawn location
 	 */
 	public boolean isTeamActive() {
-		return ordinal() < ProtectTheEgg.getInstance().getGameConfig().getMaxTeams()
-				&& !team.getSpawns().isEmpty();
+		return !team.getSpawns().isEmpty();
 	}
 
 	/**

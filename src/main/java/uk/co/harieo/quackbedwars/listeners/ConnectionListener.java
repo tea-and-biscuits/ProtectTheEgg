@@ -3,6 +3,8 @@ package uk.co.harieo.quackbedwars.listeners;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -50,8 +52,14 @@ public class ConnectionListener implements Listener {
 
 		player.setGameMode(GameMode.SURVIVAL);
 		player.setFoodLevel(20);
-		player.setHealth(20);
 		player.getInventory().clear();
+
+		// This is required as the client in this case changes max health attributes on shared minigames servers
+		AttributeInstance maxHealthAttribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+		if (maxHealthAttribute != null) {
+			maxHealthAttribute.setBaseValue(20);
+		}
+		player.setHealth(20);
 
 		// Clear all lingering potion effects
 		for (PotionEffect effect : player.getActivePotionEffects()) {

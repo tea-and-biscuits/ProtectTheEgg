@@ -26,6 +26,7 @@ import uk.co.harieo.quackbedwars.scoreboard.BedWarsProcessor;
 import uk.co.harieo.quackbedwars.scoreboard.TeamStatusElement;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
+import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
 public class GameStartStage {
 
@@ -109,7 +110,13 @@ public class GameStartStage {
 	private static void releasePlayers(ProtectTheEgg plugin) {
 		plugin.setGameStage(GameStage.IN_GAME);
 		gameTimer.start();
-		PregameCages.deleteCages();
+
+		// Spawns may have placeholder blocks so delete all cages to prevent lingering blocks
+		for (BedWarsTeamData teamData : BedWarsTeamData.values()) {
+			if (teamData.isTeamActive()) {
+				teamData.getTeam().getSpawns().getAllSpawns().forEach(PregameCages::deleteCage);
+			}
+		}
 	}
 
 	/**
