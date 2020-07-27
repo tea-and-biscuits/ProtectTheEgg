@@ -122,14 +122,14 @@ public class GameEndStage {
 
 		endingScoreboard.addBlankLine();
 		endingScoreboard.addLine(new ConstantElement(color + team.getName() + " Team"));
-		endingScoreboard.addLine(new ConstantElement(color + "has Won!"));
+		endingScoreboard.addLine(new ConstantElement("has Won!"));
 		endingScoreboard.addBlankLine();
 
 		Set<Player> onlinePlayers = team.getOnlineMembers();
 		int iterations = 0; // Can't use an incremental for loop with a set
 		for (Player player : onlinePlayers) {
 			if (iterations < 9) {
-				endingScoreboard.addLine(new ConstantElement(color + player.getName()));
+				endingScoreboard.addLine(new ConstantElement(player.getName()));
 				iterations++;
 			} else {
 				break;

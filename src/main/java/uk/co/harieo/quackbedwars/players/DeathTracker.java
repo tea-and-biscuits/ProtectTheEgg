@@ -60,12 +60,11 @@ public class DeathTracker implements Listener {
 
 					// Respawn the player and update their statistics
 					if (victimTeam != null) {
-						teleportToNextSpawn(victim, victimTeam);
-
 						Statistic.DEATHS.addValue(victim, 1);
 						TeamGameData gameData = TeamGameData.getGameData(victimTeam);
 
 						spillInventory(victim);
+						teleportToNextSpawn(victim, victimTeam);
 						if (gameData.isEggIntact()) {
 							delayedRespawn(victim, victimTeam);
 						} else {

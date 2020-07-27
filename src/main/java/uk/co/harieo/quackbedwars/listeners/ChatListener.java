@@ -19,14 +19,14 @@ public class ChatListener implements Listener {
 	public void onAsyncChat(AsyncPlayerChatEvent event) {
 		ProtectTheEgg plugin = ProtectTheEgg.getInstance();
 		event.setCancelled(true);
-		if (plugin.getGameStage() != GameStage.LOBBY && plugin.getGameConfig().getPlayersPerTeam() > 1) {
-			formatForTeams(event, plugin);
+		if (plugin.getGameStage() != GameStage.LOBBY) {
+			formatAndDistribute(event, plugin);
 		} else {
 			Bukkit.broadcastMessage(formatPlayerMessage(event.getPlayer(), event.getMessage()));
 		}
 	}
 
-	private void formatForTeams(AsyncPlayerChatEvent event, ProtectTheEgg plugin) {
+	private void formatAndDistribute(AsyncPlayerChatEvent event, ProtectTheEgg plugin) {
 		Player player = event.getPlayer();
 		String message = event.getMessage();
 
@@ -34,10 +34,14 @@ public class ChatListener implements Listener {
 			PlayerBasedTeam team = plugin.getTeamHandler().getTeam(player);
 			String formattedMessage = formatPlayerMessage(player, message);
 
-			if (message.startsWith("!")) {
-				Bukkit.broadcastMessage(ChatColor.YELLOW + "Shout ｜ " + formattedMessage.replaceFirst("!", ""));
+			if (plugin.getGameConfig().getPlayersPerTeam() > 1) {
+				if (message.startsWith("!")) {
+					Bukkit.broadcastMessage(ChatColor.YELLOW + "Shout ｜ " + formattedMessage.replaceFirst("!", ""));
+				} else {
+					conditionalBroadcast(formattedMessage, team::isMember);
+				}
 			} else {
-				conditionalBroadcast(formattedMessage, team::isMember);
+				Bukkit.broadcastMessage(formattedMessage);
 			}
 		} else {
 			conditionalBroadcast(ChatColor.GRAY + "[Spectator] " + player.getName() + " " + ChatColor.DARK_GRAY
