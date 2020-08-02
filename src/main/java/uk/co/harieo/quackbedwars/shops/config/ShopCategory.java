@@ -1,10 +1,13 @@
 package uk.co.harieo.quackbedwars.shops.config;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -12,6 +15,7 @@ import uk.co.harieo.minigames.menus.MenuItem;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.shops.ShopMenu;
 import uk.co.harieo.quackbedwars.shops.ShopType;
+import uk.co.harieo.quackbedwars.teams.menu.BackButtonItem;
 
 public class ShopCategory extends MenuItem {
 
@@ -52,10 +56,13 @@ public class ShopCategory extends MenuItem {
 	 */
 	public void updateMenu(ShopType type) {
 		int amountOfItems = purchasableItems.size();
-		menu = new ShopMenu(type, amountOfItems / 9 + 1);
+		menu = new ShopMenu(type, (amountOfItems + 1) / 9 + 1); // amount+1 for the 'go back' item
+
 		for (int i = 0; i < amountOfItems; i++) {
 			menu.setStaticItem(i, purchasableItems.get(i));
 		}
+		menu.setStaticItem(menu.getSlotSize() - 1, new BackButtonItem(type));
+
 		setOnClick(player -> menu.getOrCreateMenu(player).showInventory()); // Allows the menu to be opened
 	}
 

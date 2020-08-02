@@ -2,6 +2,7 @@ package uk.co.harieo.quackbedwars.egg;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -9,12 +10,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Objects;
 import net.md_5.bungee.api.ChatColor;
 import uk.co.harieo.minigames.teams.PlayerBasedTeam;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
+import uk.co.harieo.quackbedwars.currency.handlers.CurrencySpawnHandler;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.Statistic;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
@@ -79,16 +82,32 @@ public class EggListener implements Listener {
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 		// If the block above the broken block is a known egg, prevent it being broken as eggs will fall
-		Location location = event.getBlock().getLocation().clone().add(0, 1, 0);
-		if (EggData.getFromCachedBlock(location.getBlock()) != null) {
+		if (isBelowEgg(event.getBlock())) {
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler
-	public void onBlockExplode(BlockExplodeEvent event) {
-		if (isEgg(event.getBlock())) {
-			event.setCancelled(true);
+	public void onBlockExplode(EntityExplodeEvent event) {
+		if (event.getEntityType() == EntityType.PRIMED_TNT) {
+			// Stop any block from being broken if it's within 5 blocks of an egg or 3 blocks of a resource spawner
+			event.blockList().removeIf(block -> {
+				Location blockLocation = block.getLocation();
+
+				for (Block eggBlock : EggData.getCachedEggs().keySet()) {
+					if (eggBlock.getLocation().distance(blockLocation) <= 5) {
+						return true;
+					}
+				}
+
+				for (Location location : CurrencySpawnHandler.getSpawnerLocations().keySet()) {
+					if (location.distance(blockLocation) <= 3) {
+						return true;
+					}
+				}
+
+				return false;
+			});
 		}
 	}
 
@@ -130,6 +149,17 @@ public class EggListener implements Listener {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Checks whether the specified block is directly underneath an egg
+	 *
+	 * @param block to check
+	 * @return whether the block is below a registered egg
+	 */
+	private boolean isBelowEgg(Block block) {
+		Location location = block.getLocation().clone().add(0, 1, 0);
+		return EggData.getFromCachedBlock(location.getBlock()) != null;
 	}
 
 }

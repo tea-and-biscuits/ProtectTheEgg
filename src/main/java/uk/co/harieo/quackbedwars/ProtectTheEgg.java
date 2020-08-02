@@ -20,10 +20,7 @@ import uk.co.harieo.quackbedwars.commands.TeamSelectCommand;
 import uk.co.harieo.quackbedwars.config.GameConfig;
 import uk.co.harieo.quackbedwars.config.GameWorldConfig;
 import uk.co.harieo.quackbedwars.egg.EggListener;
-import uk.co.harieo.quackbedwars.listeners.ChatListener;
-import uk.co.harieo.quackbedwars.listeners.ConnectionListener;
-import uk.co.harieo.quackbedwars.listeners.LobbyHotbarListener;
-import uk.co.harieo.quackbedwars.listeners.WorldProtectionListener;
+import uk.co.harieo.quackbedwars.listeners.*;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.PlayerEffects;
 import uk.co.harieo.quackbedwars.scoreboard.BedWarsProcessor;
@@ -93,7 +90,7 @@ public class ProtectTheEgg extends DefaultMinigame {
 		setupScoreboard();
 		registerListeners(new ConnectionListener(), new WorldProtectionListener(), new EggListener(),
 				new DeathTracker(), new ShopNPCListener(), new TrapListener(), new PlayerEffects(),
-				new LobbyHotbarListener(this), new ChatListener());
+				new LobbyHotbarListener(this), new ChatListener(), new FeatureListener());
 		registerCommand(new MapCommand(), "map", "maps");
 		registerCommand(new ForceStartCommand(), "force", "forcestart");
 		registerCommand(new TeamSelectCommand(), "team");

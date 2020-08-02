@@ -7,7 +7,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.*;
-import java.util.Map.Entry;
 import uk.co.harieo.minigames.teams.Team;
 import uk.co.harieo.quackbedwars.currency.Currency;
 import uk.co.harieo.quackbedwars.currency.CurrencySpawnRate;
@@ -24,7 +23,7 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 	RESOURCES_THREE("Resources III", 6, RESOURCES_TWO,
 			new CurrencySpawnRate(Currency.IRON, 1, 1),
 			new CurrencySpawnRate(Currency.GOLD, 3, 2)),
-	RESOURCES_FOUR("Resources IV", 8, RESOURCES_THREE, new CurrencySpawnRate(Currency.EMERALD, 3, 2));
+	RESOURCES_FOUR("Resources IV", 8, RESOURCES_THREE, new CurrencySpawnRate(Currency.EMERALD, 20, 1));
 
 	private static final UpgradeCategory category;
 

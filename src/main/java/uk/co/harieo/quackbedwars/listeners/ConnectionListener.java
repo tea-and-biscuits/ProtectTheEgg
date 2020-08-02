@@ -53,6 +53,7 @@ public class ConnectionListener implements Listener {
 		player.setGameMode(GameMode.SURVIVAL);
 		player.setFoodLevel(20);
 		player.getInventory().clear();
+		player.getEnderChest().clear();
 
 		// This is required as the client in this case changes max health attributes on shared minigames servers
 		AttributeInstance maxHealthAttribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);

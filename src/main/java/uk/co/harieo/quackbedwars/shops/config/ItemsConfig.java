@@ -34,6 +34,7 @@ public class ItemsConfig {
 			categories = ShopCategory.parseCategories(config);
 
 			int amountOfCategories = categories.size();
+
 			ShopMenu categoryMenu = new ShopMenu(ShopType.ITEMS, amountOfCategories / 9 + 1);
 			for (int i = 0; i < amountOfCategories; i++) {
 				ShopCategory category = categories.get(i);

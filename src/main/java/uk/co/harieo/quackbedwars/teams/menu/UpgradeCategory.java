@@ -33,9 +33,9 @@ public class UpgradeCategory extends MenuItem {
 	}
 
 	/**
-	 * Retrieves the {@link ShopMenu} for the specified player's {@link BedWarsTeamData}, or creates it if not cached, then
-	 * updates all the instances of {@link UpgradeItem} to display up-to-date information. The menu is then shown to
-	 * the player.
+	 * Retrieves the {@link ShopMenu} for the specified player's {@link BedWarsTeamData}, or creates it if not cached,
+	 * then updates all the instances of {@link UpgradeItem} to display up-to-date information. The menu is then shown
+	 * to the player.
 	 *
 	 * @param player to show the menu to
 	 */
@@ -44,10 +44,11 @@ public class UpgradeCategory extends MenuItem {
 		if (team != null) {
 			ShopMenu teamMenu = subMenuMap.get(team);
 			if (teamMenu == null) {
-				teamMenu = new ShopMenu(ShopType.UPGRADES, upgrades.size() / 9 + 1);
+				teamMenu = new ShopMenu(ShopType.UPGRADES, (upgrades.size() + 1) / 9 + 1);
 				for (int i = 0; i < upgrades.size(); i++) { // Add the base items to the new menu
 					teamMenu.setStaticItem(i, new UpgradeItem(team, upgrades.get(i)));
 				}
+				teamMenu.setStaticItem(teamMenu.getSlotSize() - 1, new BackButtonItem(ShopType.UPGRADES));
 				subMenuMap.put(team, teamMenu);
 			}
 
