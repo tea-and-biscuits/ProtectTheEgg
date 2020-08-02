@@ -95,7 +95,8 @@ public class EggListener implements Listener {
 				Location blockLocation = block.getLocation();
 
 				for (Block eggBlock : EggData.getCachedEggs().keySet()) {
-					if (eggBlock.getLocation().distance(blockLocation) <= 5) {
+					Location eggLocation = eggBlock.getLocation();
+					if (block.equals(eggBlock) || (eggLocation.distance(blockLocation) <= 5 && blockLocation.getY() < eggLocation.getY())) {
 						return true;
 					}
 				}

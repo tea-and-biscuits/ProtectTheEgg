@@ -1,5 +1,6 @@
 package uk.co.harieo.quackbedwars.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -14,6 +15,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import uk.co.harieo.quackbedwars.ProtectTheEgg;
+
 public class FeatureListener implements Listener {
 
 	@EventHandler
@@ -24,7 +27,8 @@ public class FeatureListener implements Listener {
 
 			ItemStack mainHandItem = inventory.getItemInMainHand();
 			if (isWaterBucket(mainHandItem) || isWaterBucket(inventory.getItemInOffHand())) {
-				inventory.setItem(inventory.getHeldItemSlot(), null);
+				Bukkit.getScheduler().runTaskLater(ProtectTheEgg.getInstance(),
+						() -> inventory.setItem(inventory.getHeldItemSlot(), null), 5);
 			}
 		}
 	}
