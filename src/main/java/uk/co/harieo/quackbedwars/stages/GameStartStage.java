@@ -26,7 +26,6 @@ import uk.co.harieo.quackbedwars.scoreboard.BedWarsProcessor;
 import uk.co.harieo.quackbedwars.scoreboard.TeamStatusElement;
 import uk.co.harieo.quackbedwars.teams.BedWarsTeamData;
 import uk.co.harieo.quackbedwars.teams.TeamGameData;
-import uk.co.harieo.quackbedwars.teams.handlers.TeamSpawnHandler;
 
 public class GameStartStage {
 

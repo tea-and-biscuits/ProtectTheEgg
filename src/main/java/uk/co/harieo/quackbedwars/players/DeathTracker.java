@@ -205,11 +205,12 @@ public class DeathTracker implements Listener {
 		World world = player.getWorld();
 		PlayerInventory inventory = player.getInventory();
 		for (ItemStack item : inventory) {
-			if (item != null) {
+			if (item != null && item.getType() != Material.WOODEN_SWORD) {
 				world.dropItemNaturally(deathLocation, item);
 			}
 		}
 		inventory.clear();
+		inventory.addItem(new ItemStack(Material.WOODEN_SWORD));
 	}
 
 	/**
@@ -255,6 +256,7 @@ public class DeathTracker implements Listener {
 		UUID uuid = player.getUniqueId();
 		livingPlayers.add(uuid);
 		playing.add(uuid);
+		player.getInventory().addItem(new ItemStack(Material.WOODEN_SWORD));
 	}
 
 	/**

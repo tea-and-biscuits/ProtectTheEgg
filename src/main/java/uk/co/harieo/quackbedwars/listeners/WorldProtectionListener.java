@@ -7,6 +7,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 
 import uk.co.harieo.minigames.games.GameStage;
 import uk.co.harieo.quackbedwars.ProtectTheEgg;
@@ -36,6 +37,11 @@ public class WorldProtectionListener implements Listener {
 
 	@EventHandler
 	public void onItemCraft(CraftItemEvent event) {
+		event.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onPortalCreate(PortalCreateEvent event) {
 		event.setCancelled(true);
 	}
 
