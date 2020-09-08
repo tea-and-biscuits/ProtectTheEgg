@@ -106,7 +106,7 @@ public class ConnectionListener implements Listener {
 		} else if (stage != GameStage.ERROR
 				&& playerCount < 2) { // If there is an error, the server may need to be up for repairs
 			Bukkit.getServer().shutdown();
-		} else if (stage == GameStage.IN_GAME) {
+		} else if (stage == GameStage.IN_GAME || stage == GameStage.PRE_GAME) {
 			GameEndStage.checkForWinningTeam();
 			if (DeathTracker.isPlaying(player)) {
 				Team team = teamHandler.getTeam(player);

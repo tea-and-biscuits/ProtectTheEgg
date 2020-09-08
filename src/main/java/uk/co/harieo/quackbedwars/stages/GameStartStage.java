@@ -59,13 +59,7 @@ public class GameStartStage {
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			assignPlayerTeam(plugin, player); // Assign a team
-			DeathTracker.markAlive(player); // Mark the player as in the game
 		}
-
-		// Scoreboard requires that all teams be assigned before formatting, which is in the loop above
-		formatScoreboard();
-		Bukkit.getOnlinePlayers().forEach(GameStartStage::showScoreboard);
-		updateTabListHandler(); // Update team prefixes in the tab list
 
 		// Activate team assets if the team has at least 1 member playing in it
 		for (BedWarsTeamData teamData : BedWarsTeamData.values()) {
@@ -109,6 +103,15 @@ public class GameStartStage {
 	private static void releasePlayers(ProtectTheEgg plugin) {
 		plugin.setGameStage(GameStage.IN_GAME);
 		gameTimer.start();
+
+		// Scoreboard requires that all teams be assigned before formatting, which is in the loop above
+		formatScoreboard();
+		Bukkit.getOnlinePlayers().forEach(GameStartStage::showScoreboard);
+		updateTabListHandler(); // Update team prefixes in the tab list
+
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			DeathTracker.markAlive(player); // Mark the player as in the game
+		}
 
 		// Spawns may have placeholder blocks so delete all cages to prevent lingering blocks
 		for (BedWarsTeamData teamData : BedWarsTeamData.values()) {

@@ -43,19 +43,21 @@ public class GameEndStage {
 	 * to {@link GameStage#ENDING} to indicate this.
 	 */
 	public static void checkForWinningTeam() {
-		PlayerBasedTeam lastTeamChecked = null;
-		for (Player player : DeathTracker.getLivingPlayers()) {
-			PlayerBasedTeam team = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
-			if (lastTeamChecked != null && lastTeamChecked != team) {
-				return; // There's more than 1 team left
+		if (ProtectTheEgg.getInstance().getGameStage() == GameStage.IN_GAME) {
+			PlayerBasedTeam lastTeamChecked = null;
+			for (Player player : DeathTracker.getLivingPlayers()) {
+				PlayerBasedTeam team = ProtectTheEgg.getInstance().getTeamHandler().getTeam(player);
+				if (lastTeamChecked != null && lastTeamChecked != team) {
+					return; // There's more than 1 team left
+				}
+
+				lastTeamChecked = team;
 			}
 
-			lastTeamChecked = team;
-		}
-
-		if (lastTeamChecked != null) {
-			declareWinningTeam(lastTeamChecked);
-			setEndingState();
+			if (lastTeamChecked != null) {
+				declareWinningTeam(lastTeamChecked);
+				setEndingState();
+			}
 		}
 	}
 
