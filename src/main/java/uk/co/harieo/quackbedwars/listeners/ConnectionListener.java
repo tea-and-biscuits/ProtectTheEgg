@@ -117,6 +117,7 @@ public class ConnectionListener implements Listener {
 		}
 
 		teamHandler.unsetTeam(player);
+		ProtectTheEgg.updateTabListProcessors();
 	}
 
 	private void updateTimer(ProtectTheEgg plugin, int playerCount) {

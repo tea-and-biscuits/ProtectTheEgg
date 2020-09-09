@@ -88,8 +88,7 @@ public class ProtectTheEgg extends DefaultMinigame {
 		upgradesMenu.setStaticItem(2, PurchasableTraps.getCategory());
 
 		setupScoreboard();
-		registerListeners(new ConnectionListener(), new WorldProtectionListener(), new EggListener(),
-				new DeathTracker(), new ShopNPCListener(), new TrapListener(), new PlayerEffects(),
+		registerListeners(new ConnectionListener(), new WorldProtectionListener(), new ShopNPCListener(), new TrapListener(), new PlayerEffects(),
 				new LobbyHotbarListener(this), new ChatListener(), new FeatureListener());
 		registerCommand(new MapCommand(), "map", "maps");
 		registerCommand(new ForceStartCommand(), "force", "forcestart");

@@ -20,6 +20,7 @@ import uk.co.harieo.quackbedwars.ProtectTheEgg;
 import uk.co.harieo.quackbedwars.currency.handlers.CurrencySpawnHandler;
 import uk.co.harieo.quackbedwars.currency.spawners.TeamSpawner;
 import uk.co.harieo.quackbedwars.egg.EggData;
+import uk.co.harieo.quackbedwars.egg.EggListener;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
 import uk.co.harieo.quackbedwars.players.PlayerEffects;
 import uk.co.harieo.quackbedwars.scoreboard.BedWarsProcessor;
@@ -45,6 +46,7 @@ public class GameStartStage {
 	public static void startGame() {
 		ProtectTheEgg plugin = ProtectTheEgg.getInstance();
 		plugin.setGameStage(GameStage.PRE_GAME);
+		plugin.registerListeners(new EggListener(), new DeathTracker());
 		MinigamesCore.setAcceptingPlayers(false);
 		Bukkit.getPluginManager().callEvent(new MinigameStartEvent(plugin));
 
