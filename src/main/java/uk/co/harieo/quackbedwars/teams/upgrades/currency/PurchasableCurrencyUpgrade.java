@@ -23,7 +23,7 @@ public enum PurchasableCurrencyUpgrade implements CurrencyUpgrade {
 	RESOURCES_THREE("Resources III", 6, RESOURCES_TWO,
 			new CurrencySpawnRate(Currency.IRON, 1, 1),
 			new CurrencySpawnRate(Currency.GOLD, 3, 2)),
-	RESOURCES_FOUR("Resources IV", 8, RESOURCES_THREE, new CurrencySpawnRate(Currency.EMERALD, 20, 1));
+	RESOURCES_FOUR("Resources IV", 8, RESOURCES_THREE, Currency.EMERALD.getBaseSpawnRate());
 
 	private static final UpgradeCategory category;
 

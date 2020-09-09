@@ -8,7 +8,7 @@ public enum Currency {
 	IRON("Iron", ChatColor.WHITE, Material.IRON_INGOT, 4, 1, true),
 	GOLD("Gold", ChatColor.GOLD, Material.GOLD_INGOT, 5, 1, true),
 	DIAMOND("Diamond", ChatColor.AQUA, Material.DIAMOND, 20, 1, false),
-	EMERALD("Emerald", ChatColor.GREEN, Material.EMERALD, 20, 1, false);
+	EMERALD("Emerald", ChatColor.GREEN, Material.EMERALD, 30, 1, false);
 
 	private final String name;
 	private final ChatColor color;

@@ -19,6 +19,7 @@ import uk.co.harieo.quackbedwars.commands.MapCommand;
 import uk.co.harieo.quackbedwars.commands.TeamSelectCommand;
 import uk.co.harieo.quackbedwars.config.GameConfig;
 import uk.co.harieo.quackbedwars.config.GameWorldConfig;
+import uk.co.harieo.quackbedwars.currency.handlers.SpawnerProtectionListener;
 import uk.co.harieo.quackbedwars.egg.EggListener;
 import uk.co.harieo.quackbedwars.listeners.*;
 import uk.co.harieo.quackbedwars.players.DeathTracker;
@@ -88,8 +89,10 @@ public class ProtectTheEgg extends DefaultMinigame {
 		upgradesMenu.setStaticItem(2, PurchasableTraps.getCategory());
 
 		setupScoreboard();
-		registerListeners(new ConnectionListener(), new WorldProtectionListener(), new ShopNPCListener(), new TrapListener(), new PlayerEffects(),
-				new LobbyHotbarListener(this), new ChatListener(), new FeatureListener());
+		registerListeners(new ConnectionListener(), new WorldProtectionListener(), new ShopNPCListener(),
+				new TrapListener(), new PlayerEffects(),
+				new LobbyHotbarListener(this), new ChatListener(), new FeatureListener(),
+				new SpawnerProtectionListener());
 		registerCommand(new MapCommand(), "map", "maps");
 		registerCommand(new ForceStartCommand(), "force", "forcestart");
 		registerCommand(new TeamSelectCommand(), "team");
